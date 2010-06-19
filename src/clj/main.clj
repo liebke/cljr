@@ -165,6 +165,10 @@
    {:on-close javax.swing.JFrame/EXIT_ON_CLOSE}))
 
 
+(defn clj-run [filename]
+  (apply clojure.main/main filename))
+
+
 (defn clj-list []
   (let [dependencies (:dependencies (get-project))]
     (println "\n\nCurrently installed libraries:")
@@ -249,6 +253,7 @@
 	:versions (apply clj-versions args)
 	:describe (apply clj-describe args)
 	:repl (clj-repl)
+	:run (clj-run args)
 	:help (println (help-text))
 	(println "unrecognized command to clj."))))
 
