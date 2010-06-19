@@ -5,5 +5,5 @@
                  [clojure-http-client "1.1.0-SNAPSHOT"]
 		 [swingrepl "1.0.0-SNAPSHOT"]
                  [leiningen "1.0.0"]]
-  :dev-dependencies [[lein-clojars "0.5.0-SNAPSHOT"]]
+  :dev-dependencies [[lein-clojars "0.5.0"]]
   :main clj.main)

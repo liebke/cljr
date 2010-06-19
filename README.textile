@@ -1,6 +1,7 @@
 clj is a Clojure REPL and package management system.
 
-Usage: clj command arguments
+
+Usage: clj command [arguments]
 
 Available commands:
 *  repl: Starts a Clojure swingrepl.
@@ -11,6 +12,36 @@ Available commands:
 *  versions package-name: Prints a list of the versions of the given package available on clojars.org
 *  remove package-name: Removes given package from the clj-repo dependency list, then reinstalls all packages.
 
+
+
+Installation:
+
+Download the clj jar file (or follow the instructions below to build from source):
+
+@wget http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar@
+
+and either double-click on the jar file to run self-install, or run the self-install command from the command line:
+
+@java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+
+
+self-install will create a $HOME/.clj directory and initialize a local reposistory for Clojure packages in $HOME/.clj/lib. It will also create the shell and Windows batch scripts, $HOME/.clj/bin/clj and $HOME/.clj/bin/clj.bat, add $HOME/.clj/bin to your path,
+
+@export PATH=~/.clj/bin:$PATH@
+
+or move the scripts to a directory on your path.
+
+
+Build instructions:
+
+@lein deps@
+@lein uberjar@
+@java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+
+
+
 Copyright (C) 2010 David Edgar Liebke
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
+
