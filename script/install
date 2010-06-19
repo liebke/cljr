@@ -1,0 +1,6 @@
+#!/bin/sh
+
+lein deps
+lein uberjar
+java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install
+

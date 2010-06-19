@@ -1,0 +1,9 @@
+.*.swp
+*~
+pom.xml
+build
+target
+lib
+classes
+*.jar
+*.log

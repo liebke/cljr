@@ -1,0 +1,16 @@
+clj is a Clojure REPL and package management system.
+
+Usage: clj command arguments
+
+Available commands:
+*  repl: Starts a Clojure swingrepl.
+*  list: Prints a list of installed packages.
+*  search term: Prints a list of packages on clojars.org with names that contain the given search term.
+*  install package-name [package-version]: Installs the given package from clojars.org, defaulting to the inferred latest version.
+*  describe package-name [package-version]: Prints the description of the given package as found in the description field of its pom file.
+*  versions package-name: Prints a list of the versions of the given package available on clojars.org
+*  remove package-name: Removes given package from the clj-repo dependency list, then reinstalls all packages.
+
+Copyright (C) 2010 David Edgar Liebke
+
+Distributed under the Eclipse Public License, the same as Clojure.

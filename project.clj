@@ -1,0 +1,9 @@
+(defproject clj "1.0.0-SNAPSHOT"
+  :description "clj is a Clojure REPL and package managment system."
+  :dependencies [[org.clojure/clojure "1.2.0-master-SNAPSHOT"]
+                 [org.clojure/clojure-contrib "1.2.0-SNAPSHOT"]
+                 [clojure-http-client "1.1.0-SNAPSHOT"]
+		 [swingrepl "1.0.0-SNAPSHOT"]
+                 [leiningen "1.0.0"]]
+  :dev-dependencies [[lein-clojars "0.5.0-SNAPSHOT"]]
+  :main clj.main)
