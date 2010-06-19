@@ -17,6 +17,7 @@
        "Usage: clj command [arguments]" \newline\newline
        "Available commands:" \newline
        "*  repl: Starts a Clojure swingrepl." \newline
+       "*  run filename: Runs the given Clojure file." \newline
        "*  list: Prints a list of installed packages." \newline
        "*  search term: Prints a list of packages on clojars.org with names that contain the given search term." \newline
        "*  install package-name [package-version]: Installs the given package from clojars.org, defaulting to the inferred latest version." \newline
