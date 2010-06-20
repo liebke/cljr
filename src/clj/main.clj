@@ -50,28 +50,28 @@
        "   must be followed by 'clj clean' and 'clj reload' to actually remove packages " \newline
        "   from the repository." \newline
        \newline
-       "*  clean: Removes all packages from ~/.clj/lib directory." \newline
+       "*  clean: Removes all packages from $CLJ_HOME/lib directory." \newline
        \newline
        "*  reload: Reloads all packages listed by 'clj list'." \newline
        \newline
        \newline
-       "Packages are installed in $HOME/.clj/lib, and can be used by applications other " \newline
+       "Packages are installed in $CLJ_HOME/lib, and can be used by applications other " \newline
        "than clj by including the jars in that directory on the classpath. For instance, " \newline
        "to start a command line REPL with jline, run the following command: "\newline
        \newline
-       "   java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main" \newline
+       "   java -cp $CLJ_HOME/lib/'*' jline.ConsoleRunner clojure.main" \newline
        \newline))
 
 
 (defn get-clj-home []
   (let [user-home (System/getProperty "user.home")
-	clj-home (file user-home ".clj")]
-    clj-home))
+	default-clj-home (file user-home ".clj")]
+    (or (System/getProperty "clj.home") default-clj-home)))
 
 
 (defn clj-sh-script []
   (str "#!/bin/sh" \newline
-       "CLJ_HOME=$HOME/.clj" \newline
+       "CLJ_HOME=" (get-clj-home) \newline
        "CLASSPATH=$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':.:$CLJ_HOME/src:$CLJ_HOME/script" \newline
        "if [ \"$1\" = \"repl\" ]; then" \newline
        "   java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main" \newline
@@ -82,16 +82,9 @@
 
 (defn clj-bat-script []
   (let [clj-home (get-clj-home)]
-    (str "@echo off" \newline
-	 "set CLJ_HOME=\"" clj-home "\"" \newline
-	 "setLocal EnableDelayedExpansion" \newline
-	 "set CLASSPATH=\"" \newline
-	 "for /R %CLJ_HOME%/lib %%a in (*.jar) do (" \newline
-	 "  set CLASSPATH=!CLASSPATH!;%%a" \newline
-	 ")" \newline
-	 "set CLASSPATH=!CLASSPATH!\"" \newline
-	 "set CLASSPATH=%CLASSPATH%;src;." \newline
-	 "java -cp \"$CLASSPATH\" -Dclj.home=\"%CLJ_HOME%\" clj.main $*" \newline)))
+    (str "java -Dclj.home=" (get-clj-home)
+	 " -cp " (get-clj-home) (sep) "lib" (sep) "*" (path-sep) (get-clj-home) (sep) "clj.jar "
+	 "clj.main %*")))
 
 
 (defn clj-project-clj []
@@ -135,11 +128,11 @@
        (if (need-to-init? clj-home)
 	 (do
 	   (println "Initializing clj...")
-	   (println "Creating ~/.clj directory structure...")
+	   (println "Creating clj home, " (get-clj-home) " directory structure...")
 	   (doseq [d [clj-home clj-lib clj-src clj-bin]] (.mkdirs d))
 	   (println (str "Copying " current-jar " to " clj-home (sep) "clj.jar..."))
 	   (copy current-jar (file clj-home "clj.jar"))
-	   (println "Creating ~/.clj/project.clj file...")
+	   (println "Creating " clj-home "/project.clj file...")
 	   (spit (file clj-home "project.clj") (clj-project-clj))
 	   (println "Creating script files...")
 	   (doto (file clj-bin "clj")
@@ -151,8 +144,8 @@
 	   (println "Loading core dependencies...")
 	   (clj-reload)
 	   (println "Installation complete.")
-	   (println (str "Add ~/.clj/bin to your PATH:" \newline
-			 "export PATH=~/.clj/bin:$PATH")))
+	   (println (str "Add " clj-home "/bin to your PATH:" \newline
+			 "export PATH=" clj-home "/bin:$PATH")))
 	 (println clj-home " is already initialized.")))))
 
 
