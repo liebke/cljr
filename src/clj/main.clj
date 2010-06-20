@@ -22,7 +22,9 @@
        \newline
        "Available commands:" \newline
        \newline
-       "*  repl: Starts a Clojure swingrepl." \newline
+       "*  repl: Starts a Clojure repl." \newline
+       \newline
+       "*  swingrepl: Starts a Clojure swingrepl." \newline
        \newline
        "*  run filename: Runs the given Clojure file." \newline
        \newline
@@ -68,7 +70,7 @@
        "CLJ_HOME=$HOME/.clj" \newline
        "CLASSPATH=$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':.:$CLJ_HOME/src:$CLJ_HOME/script" \newline
        "if [ \"$1\" = \"repl\" ]; then" \newline
-       "   java -cp \"$CLASSPATH\" jline.ConsoleRunner clojure.main" \newline
+       "   java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main" \newline
        "else" \newline
        "   java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline
        "fi" \newline))

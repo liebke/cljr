@@ -6,7 +6,8 @@ h2. Overview
 *Usage:* @clj command [arguments]@
 
 *Available commands:*
-*  @repl@: Starts a Clojure swingrepl.
+*  @repl@: Starts a Clojure repl.
+*  @swingrepl@: Starts a Clojure swingrepl.
 *  @run filename@: Runs the given Clojure file.
 *  @list@: Prints a list of installed packages.
 *  @search term@: Prints a list of packages on clojars.org with names that contain the given search term.
