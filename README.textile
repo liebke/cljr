@@ -1,11 +1,28 @@
-h2. Overview
+
+h2. Quick start
 
 *clj* is a Clojure REPL and package management system.
 
 
+*Install*
+# Download <a href="http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar">http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar</a>
+# Run @java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+# Copy @~/.clj/bin/clj(.bat)@ to your path
+
+*Try it out*
+# Run @clj list@ to see what packages are installed.
+# Run @clj search compojure@ to search for <a href="http://github.com/weavejester/compojure">Compojure</a> on <a href="http://clojars.org">Clojars</a>.
+# Run @clj describe compojure@ to get a description of the latest version of compojure.
+# Run @clj install compojure@ to install the latest version of compojure.
+# Run @clj repl@ or @clj swingrepl@ to launch a REPL configured for all the installed packages.
+
+
+
+h2. Documentation
+
 *Usage:* @clj command [arguments]@
 
-*Available commands:*
+*Available commands*
 *  @repl@: Starts a Clojure repl.
 *  @swingrepl@: Starts a Clojure swingrepl.
 *  @run filename@: Runs the given Clojure file.
@@ -25,10 +42,7 @@ REPL with jline, run the following command:
 
    @java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main@
 
-
-
-h2. Installation
-
+*Installation*
 Download the <a href="http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar">clj.jar</a> file (or follow the instructions below to build from source):
 
 @wget http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar@
@@ -38,7 +52,7 @@ and either double-click on the jar file to run self-install, or run the self-ins
 @java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
 
 
-*self-install will:*
+*Self-install will*
 * create a @$HOME/.clj@ directory 
 * initialize a local reposistory for Clojure packages in @$HOME/.clj/lib@
 * create the shell and Windows batch scripts, 
@@ -46,11 +60,17 @@ and either double-click on the jar file to run self-install, or run the self-ins
 ** @$HOME/.clj/bin/clj.bat@
 
 
-You should either add @$HOME/.clj/bin@ to your path,
 
-@export PATH=~/.clj/bin:$PATH@
+*Alternative installation directories*
+You can provide alternative CLJ_HOME and USER_HOME directories by passing them as properties to the above java command. 
 
-or move the clj scripts to a directory on your path.
+For instance, the following command creates the @.clj@ and Maven @.m2@ directories under @C:\@ on a Windows box (something I had to do since Windows had problems with my shared home under VMWare, \\vmware-host\...).
+
+@java -Duser.home=C:\ -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+
+
+*clj scripts*
+Once installation is complete, you should either add @$HOME/.clj/bin@ to your path, @export PATH=~/.clj/bin:$PATH@ on Unix/Mac OS X, or move the platform-appropriate clj script to a directory on your path.
 
 
 h2. Build instructions
