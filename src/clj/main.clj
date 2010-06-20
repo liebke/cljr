@@ -38,9 +38,15 @@
        "   package as found in the description field of its pom file." \newline
        \newline
        "*  versions package-name: Prints a list of the versions of the given package " \newline
-       "   available on clojars.org" \newline\newline
-       "*  remove package-name: Removes given package from the clj-repo dependency list, " \newline
-       "    then reinstalls all packages." \newline
+       "   available on clojars.org" \newline
+       \newline
+       "*  remove package-name: Removes given package from the clj-repo package list, " \newline
+       "   must be followed by 'clj clean' and 'clj reload' to actually remove packages " \newline
+       "   from the repository." \newline
+       \newline
+       "*  clean: Removes all packages from ~/.clj/lib directory." \newline
+       \newline
+       "*  reload: Reloads all packages listed by 'clj list'." \newline
        \newline
        \newline
        "Packages are installed in $HOME/.clj/lib, and can be used by applications other " \newline
@@ -60,7 +66,7 @@
 (defn clj-sh-script []
   (str "#!/bin/sh" \newline
        "CLJ_HOME=$HOME/.clj" \newline
-       "CLASSPATH=$CLJ_HOME/src:$CLJ_HOME/script:$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':." \newline
+       "CLASSPATH=$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':.:$CLJ_HOME/src:$CLJ_HOME/script" \newline
        "java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline))
 
 
@@ -101,8 +107,8 @@
 	       (= "clj-repo" (:name (get-project)))))))
 
 
-(defn clj-deps
-  ([] (deps (get-project))))
+(defn clj-reload []
+  (deps (get-project)))
 
 
 (defn clj-self-install
@@ -133,7 +139,7 @@
 	     (spit (clj-bat-script))
 	     (.setExecutable true))
 	   (println "Loading core dependencies...")
-	   (clj-deps)
+	   (clj-reload)
 	   (println "Installation complete.")
 	   (println (str "Add ~/.clj/bin to your PATH:" \newline
 			 "export PATH=~/.clj/bin:$PATH")))
@@ -141,30 +147,31 @@
 
 
 (defn get-latest-version [library-name]
-  (let [response (request "http://clojars.org/repo/all-jars.clj")]
-    (second (last (filter #(= (first %) (symbol library-name))
+  (let [response (request "http://clojars.org/repo/all-jars.clj")
+	lib-name (symbol library-name)]
+    (second (last (filter #(= (first %) lib-name)
 			  (for [line (:body-seq response)]
 			    (read-string line)))))))
 
 
 (defn clj-install
   ([library-name]
-     (let [latest-version (get-latest-version library-name)]
-       (clj-install library-name (get-latest-version library-name))))
+    (clj-install library-name (get-latest-version library-name)))
   ([library-name library-version]
-     (let [project (get-project)
-	   dependencies (:dependencies project)
-	   updated-project (assoc project :dependencies
-				  (conj dependencies
-					[(symbol library-name) library-version]))
-	   proj-str (str "(leiningen.core/defproject "
-			 (:name updated-project) " \""
-			 (:version updated-project) "\"" \newline
-			 ":description \"" (:description updated-project) "\"" \newline
-			 ":dependencies " (:dependencies updated-project) ")")]
-       (println "Installing version " library-version " of " library-name "...")
-       (spit (str (get-clj-home) "/project.clj") proj-str)
-       (clj-deps))))
+    (let [project (get-project)
+	  dependencies (:dependencies project)
+	  updated-project (assoc project :dependencies
+				 (conj dependencies
+				       [(symbol library-name)
+					library-version]))
+	  proj-str (str "(leiningen.core/defproject "
+			(:name updated-project) " \""
+			(:version updated-project) "\"" \newline
+			":description \"" (:description updated-project) "\"" \newline
+			":dependencies " (:dependencies updated-project) ")")]
+      (println "Installing version " library-version " of " library-name "...")
+      (spit (str (get-clj-home) "/project.clj") proj-str)
+      (clj-reload))))
 
 
 (defn clj-clean []
@@ -175,7 +182,8 @@
   (let [project (get-project)
 	dependencies (:dependencies project)
 	updated-project (assoc project :dependencies
-			       (into [] (filter #(not= (symbol library-name) (first %))
+			       (into [] (filter #(not= (symbol library-name)
+						       (first %))
 						dependencies)))
 	proj-str (str "(leiningen.core/defproject "
 		      (:name updated-project) " \""
@@ -183,8 +191,9 @@
 		      ":description \"" (:description updated-project) "\"" \newline
 		      ":dependencies " (:dependencies updated-project) ")")]
     (spit (str (get-clj-home) "/project.clj") proj-str)
-    (clj-clean)
-    (clj-deps)))
+    ;; (clj-clean)
+    ;; (clj-reload)
+    (println "Remember to run 'clj clean' and 'clj reload' to actually remove packages from the repo.")))
 
 
 (defn clj-repl []
@@ -271,6 +280,7 @@
   (let [cmd (keyword command)]
     (condp = cmd
 	:self-install (clj-self-install)
+	:reload (clj-reload)
 	:list (clj-list)
 	:list-repos (clj-list-repos)
 	:install (apply clj-install args)

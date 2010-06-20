@@ -13,7 +13,9 @@ h2. Overview
 *  @install package-name [package-version]@: Installs the given package from clojars.org, defaulting to the inferred latest version.
 *  @describe package-name [package-version]@: Prints the description of the given package as found in the description field of its pom file.
 *  @versions package-name@: Prints a list of the versions of the given package available on clojars.org
-*  @remove package-name@: Removes given package from the clj-repo dependency list, then reinstalls all packages.
+*  @remove package-name@: Removes given package from the clj-repo package list, must be followed by @clj clean@ and @clj reload@ to actually remove packages from the repository.
+*  @clean@: Removes all packages from @~/.clj/lib@ directory.
+*  @reload@: Reloads all packages listed by @clj list@.
 
 
 Packages are installed in @$HOME/.clj/lib@, and can be used by applications other than @clj@
