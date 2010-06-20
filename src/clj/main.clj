@@ -63,9 +63,12 @@
        \newline))
 
 
+(defn get-user-home []
+  (System/getProperty "user.home"))
+
+
 (defn get-clj-home []
-  (let [user-home (System/getProperty "user.home")
-	default-clj-home (file user-home ".clj")]
+  (let [default-clj-home (str (get-user-home) (sep) ".clj")]
     (or (System/getProperty "clj.home") default-clj-home)))
 
 
@@ -74,17 +77,18 @@
        "CLJ_HOME=" (get-clj-home) \newline
        "CLASSPATH=$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':.:$CLJ_HOME/src:$CLJ_HOME/script" \newline
        "if [ \"$1\" = \"repl\" ]; then" \newline
-       "   java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main" \newline
+       "   java -cp \"$CLASSPATH\" -Duser.home=" (get-user-home) " -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main" \newline
        "else" \newline
-       "   java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline
+       "   java -cp \"$CLASSPATH\" -Duser.home=" (get-user-home) " -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline
        "fi" \newline))
 
 
 (defn clj-bat-script []
   (let [clj-home (get-clj-home)]
-    (str "java -Dclj.home=" (get-clj-home)
+    (str "@echo off\r\n"
+      "java -Duser.home=" (get-user-home) " -Dclj.home=" (get-clj-home)
 	 " -cp " (get-clj-home) (sep) "lib" (sep) "*" (path-sep) (get-clj-home) (sep) "clj.jar "
-	 "clj.main %*")))
+	 "clj.main %* \r\n")))
 
 
 (defn clj-project-clj []
@@ -127,12 +131,13 @@
 					 (re-pattern (path-sep))))))]
        (if (need-to-init? clj-home)
 	 (do
+	   (println "--------------------------------------------------------------------------------")
 	   (println "Initializing clj...")
-	   (println "Creating clj home, " (get-clj-home) " directory structure...")
+	   (println "Creating clj home, " (get-clj-home) "...")
 	   (doseq [d [clj-home clj-lib clj-src clj-bin]] (.mkdirs d))
 	   (println (str "Copying " current-jar " to " clj-home (sep) "clj.jar..."))
 	   (copy current-jar (file clj-home "clj.jar"))
-	   (println "Creating " clj-home "/project.clj file...")
+	   (println (str "Creating " clj-home (sep) "project.clj file..."))
 	   (spit (file clj-home "project.clj") (clj-project-clj))
 	   (println "Creating script files...")
 	   (doto (file clj-bin "clj")
@@ -143,10 +148,13 @@
 	     (.setExecutable true))
 	   (println "Loading core dependencies...")
 	   (clj-reload)
-	   (println "Installation complete.")
-	   (println (str "Add " clj-home "/bin to your PATH:" \newline
-			 "export PATH=" clj-home "/bin:$PATH")))
-	 (println clj-home " is already initialized.")))))
+	   (println)
+	   (println "** Installation complete. **")
+	   (println)
+	   (println "--------------------------------------------------------------------------------")
+	   (println (str "Add " clj-home (sep) "bin to your PATH:" \newline
+			 "export PATH=" clj-home (sep) "bin:$PATH")))
+	 (println (str "** " clj-home " is already initialized. **"))))))
 
 
 (defn get-latest-version [library-name]
