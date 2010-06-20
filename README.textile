@@ -28,7 +28,7 @@ REPL with jline, run the following command:
 
 h2. Installation
 
-Download the clj jar file (or follow the instructions below to build from source):
+Download the <a href="http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar">clj.jar</a> file (or follow the instructions below to build from source):
 
 @wget http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar@
 

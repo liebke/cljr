@@ -67,7 +67,11 @@
   (str "#!/bin/sh" \newline
        "CLJ_HOME=$HOME/.clj" \newline
        "CLASSPATH=$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':.:$CLJ_HOME/src:$CLJ_HOME/script" \newline
-       "java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline))
+       "if [ \"$1\" = \"repl\" ]; then" \newline
+       "   java -cp \"$CLASSPATH\" jline.ConsoleRunner clojure.main" \newline
+       "else" \newline
+       "   java -cp \"$CLASSPATH\" -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline
+       "fi" \newline))
 
 
 (defn clj-bat-script []
@@ -276,28 +280,30 @@
 (defn clj
   "Provides access to the clj package management system. It uses the same arguments
   as the command line version, using keywords for commands and strings for arguments."
-  [command & args]
-  (let [cmd (keyword command)]
-    (condp = cmd
-	:self-install (clj-self-install)
-	:reload (clj-reload)
-	:list (clj-list)
-	:list-repos (clj-list-repos)
-	:install (apply clj-install args)
-	:remove (apply clj-remove args)
-	:clean (clj-clean)
-	:search (apply clj-search args)
-	:versions (apply clj-versions args)
-	:describe (apply clj-describe args)
-	:repl (clj-repl)
-	:run (clj-run args)
-	:help (println (help-text))
-	(println "unrecognized command to clj."))))
+  ([]
+    (if (need-to-init?)
+      (clj :self-install)
+      (clj :repl)))
+  ([command & args]
+     (let [cmd (keyword command)]
+       (condp = cmd
+	   :self-install (clj-self-install)
+	   :reload (clj-reload)
+	   :list (clj-list)
+	   :list-repos (clj-list-repos)
+	   :install (apply clj-install args)
+	   :remove (apply clj-remove args)
+	   :clean (clj-clean)
+	   :search (apply clj-search args)
+	   :versions (apply clj-versions args)
+	   :describe (apply clj-describe args)
+	   :repl (clj-repl)
+	   :swingrepl (clj-repl)
+	   :run (clj-run args)
+	   :help (println (help-text))
+	   (println "unrecognized command to clj.")))))
 
 
 (defn -main
-  ([] (if (need-to-init?)
-	(clj :self-install)
-	(clj :repl)))
   ([& args] (apply clj args)))
 
