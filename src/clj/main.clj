@@ -115,9 +115,9 @@
 
 
 (defn clj-self-install
-  ([] (clj-self-install (get-clj-home)))
-  ([clj-home]
-     (let [clj-lib (file clj-home "lib")
+  ([]
+     (let [clj-home (file (get-clj-home))
+	   clj-lib (file clj-home "lib")
 	   clj-src (file clj-home "src")
 	   clj-bin (file clj-home "bin")
 	   current-jar  (file (first
