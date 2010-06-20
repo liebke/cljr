@@ -11,6 +11,10 @@
 
 (def CLJ-VERSION "1.0.0-SNAPSHOT")
 
+(defn- sep [] (java.io.File/separator))
+
+(defn- path-sep [] (java.io.File/pathSeparator))
+
 
 (defn help-text []
   (str \newline\newline
@@ -61,7 +65,7 @@
 
 (defn get-clj-home []
   (let [user-home (System/getProperty "user.home")
-	clj-home (file (str user-home "/.clj"))]
+	clj-home (file user-home ".clj")]
     clj-home))
 
 
@@ -102,14 +106,14 @@
 
 
 (defn get-project []
-  (let [project-file (str (get-clj-home) "/project.clj")]
+  (let [project-file (str (get-clj-home) (sep) "project.clj")]
     (read-project project-file)))
 
 
 (defn need-to-init?
   ([] (need-to-init? (get-clj-home)))
   ([clj-home]
-     (not (and (.exists (file (str clj-home "/project.clj")))
+     (not (and (.exists (file clj-home "project.clj"))
 	       (= "clj-repo" (:name (get-project)))))))
 
 
@@ -120,21 +124,21 @@
 (defn clj-self-install
   ([] (clj-self-install (get-clj-home)))
   ([clj-home]
-     (let [clj-lib (file (str clj-home "/lib"))
-	   clj-src (file (str clj-home "/src"))
-	   clj-bin (file (str clj-home "/bin"))
+     (let [clj-lib (file clj-home "lib")
+	   clj-src (file clj-home "src")
+	   clj-bin (file clj-home "bin")
 	   current-jar  (file (first
 			       (filter
 				#(.endsWith % (str "clj-" CLJ-VERSION "-standalone.jar"))
 				(s/split (System/getProperty "java.class.path")
-					 #":"))))]
+					 (re-pattern (path-sep))))))]
        (if (need-to-init? clj-home)
 	 (do
 	   (println "Initializing clj...")
 	   (println "Creating ~/.clj directory structure...")
 	   (doseq [d [clj-home clj-lib clj-src clj-bin]] (.mkdirs d))
-	   (println (str "Copying " current-jar " to " clj-home "/clj.jar..."))
-	   (copy current-jar (file (str clj-home "/clj.jar")))
+	   (println (str "Copying " current-jar " to " clj-home (sep) "clj.jar..."))
+	   (copy current-jar (file clj-home "clj.jar"))
 	   (println "Creating ~/.clj/project.clj file...")
 	   (spit (file clj-home "project.clj") (clj-project-clj))
 	   (println "Creating script files...")
@@ -176,7 +180,7 @@
 			":description \"" (:description updated-project) "\"" \newline
 			":dependencies " (:dependencies updated-project) ")")]
       (println "Installing version " library-version " of " library-name "...")
-      (spit (str (get-clj-home) "/project.clj") proj-str)
+      (spit (str (get-clj-home) (sep) "project.clj") proj-str)
       (clj-reload))))
 
 
@@ -196,7 +200,7 @@
 		      (:version updated-project) "\"" \newline
 		      ":description \"" (:description updated-project) "\"" \newline
 		      ":dependencies " (:dependencies updated-project) ")")]
-    (spit (str (get-clj-home) "/project.clj") proj-str)
+    (spit (str (get-clj-home) (sep) "project.clj") proj-str)
     ;; (clj-clean)
     ;; (clj-reload)
     (println "Remember to run 'clj clean' and 'clj reload' to actually remove packages from the repo.")))
