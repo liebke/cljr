@@ -8,27 +8,48 @@
 	    [clojure.string :as s])
   (:gen-class))
 
+
 (def CLJ-VERSION "1.0.0-SNAPSHOT")
 
 
 (defn help-text []
   (str \newline\newline
-       "clj is a Clojure REPL and package management system." \newline\newline
-       "Usage: clj command [arguments]" \newline\newline
-       "Available commands:" \newline
-       "*  repl: Starts a Clojure swingrepl." \newline
-       "*  run filename: Runs the given Clojure file." \newline
-       "*  list: Prints a list of installed packages." \newline
-       "*  search term: Prints a list of packages on clojars.org with names that contain the given search term." \newline
-       "*  install package-name [package-version]: Installs the given package from clojars.org, defaulting to the inferred latest version." \newline
-       "*  describe package-name [package-version]: Prints the description of the given package as found in the description field of its pom file." \newline
-       "*  versions package-name: Prints a list of the versions of the given package available on clojars.org" \newline
-       "*  remove package-name: Removes given package from the clj-repo dependency list, then reinstalls all packages." \newline
+       "--------------------------------------------------------------------------------"
        \newline
-       "Packages are installed in $HOME/.clj/lib, and can be used by applications other than clj" \newline
-       "by including the jars in that directory on the classpath. For instance, to start a command line " \newline
-       "REPL with jline, run the following command: "\newline\newline
-       "   java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main" \newline\newline))
+       "clj is a Clojure REPL and package management system." \newline
+       \newline
+       "Usage: clj command [arguments]" \newline
+       \newline
+       "Available commands:" \newline
+       \newline
+       "*  repl: Starts a Clojure swingrepl." \newline
+       \newline
+       "*  run filename: Runs the given Clojure file." \newline
+       \newline
+       "*  list: Prints a list of installed packages." \newline
+       \newline
+       "*  search term: Prints a list of packages on clojars.org with names that contain " \newline
+       "   the given search term." \newline
+       \newline
+       "*  install package-name [package-version]: Installs the given package from " \newline
+       "   clojars.org, defaulting to the inferred latest version." \newline
+       \newline
+       "*  describe package-name [package-version]: Prints the description of the given " \newline
+       "   package as found in the description field of its pom file." \newline
+       \newline
+       "*  versions package-name: Prints a list of the versions of the given package " \newline
+       "   available on clojars.org" \newline\newline
+       "*  remove package-name: Removes given package from the clj-repo dependency list, " \newline
+       "    then reinstalls all packages." \newline
+       \newline
+       \newline
+       "Packages are installed in $HOME/.clj/lib, and can be used by applications other " \newline
+       "than clj by including the jars in that directory on the classpath. For instance, " \newline
+       "to start a command line REPL with jline, run the following command: "\newline
+       \newline
+       "   java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main" \newline
+       \newline))
+
 
 (defn get-clj-home []
   (let [user-home (System/getProperty "user.home")
@@ -178,7 +199,7 @@
 (defn clj-list []
   (let [dependencies (:dependencies (get-project))]
     (println "\n\nCurrently installed libraries:")
-    (println "------------------------------")
+    (println "--------------------------------------------------------------------------------")
     (doseq [dep dependencies]
       (println "  " (first dep) "  " (second dep)))
     (println "\n\n")))
@@ -188,7 +209,7 @@
   (let [repos (or (:repositories (get-project))
 		  leiningen.pom/default-repos)]
     (println "\n\nAvailable repositories:")
-    (println "------------------------------")
+    (println "--------------------------------------------------------------------------------")
     (doseq [repo repos]
       (println "  " (first repo) "  " (second repo)))
     (println "\n\n")))
@@ -197,7 +218,7 @@
 (defn clj-search [term]
   (let [response (request "http://clojars.org/repo/all-jars.clj")]
     (println "\n\nLibraries on Clojars.org that contain the term: " term)
-    (println "---------------------------------------------------------------")
+    (println "--------------------------------------------------------------------------------")
     (doseq [entry (for [line (:body-seq response) :when (.contains line term)]
 		    (read-string line))]
       (println "  " (first entry) "  " (second entry)))
@@ -207,7 +228,7 @@
 (defn clj-versions [library-name]
   (let [response (request "http://clojars.org/repo/all-jars.clj")]
     (println "\n\nAvailable versions for library: " library-name)
-    (println "---------------------------------------------------------------")
+    (println "--------------------------------------------------------------------------------")
     (doseq [entry (filter #(= (first %) (symbol library-name))
 			  (for [line (:body-seq response)]
 			    (read-string line)))]
@@ -235,7 +256,7 @@
 		    (str "./" library-name "/" version)
 		    (str "./" library-name "/" library-name "/" version))]
        (println (str "\n\nDescription for library: " library-name "  " version))
-       (println "---------------------------------------------------------------")
+       (println "--------------------------------------------------------------------------------")
        (println (get-description
 		 (last (for [line (:body-seq response)
 			     :when (.startsWith line id-str)]
