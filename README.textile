@@ -16,6 +16,13 @@ h2. Overview
 *  @remove package-name@: Removes given package from the clj-repo dependency list, then reinstalls all packages.
 
 
+Packages are installed in @$HOME/.clj/lib@, and can be used by applications other than @clj@
+by including the jars in the directory on the classpath. For instance, to start a command line 
+REPL with jline, run the following command: 
+
+   @java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main@
+
+
 
 h2. Installation
 

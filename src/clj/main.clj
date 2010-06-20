@@ -24,7 +24,11 @@
        "*  describe package-name [package-version]: Prints the description of the given package as found in the description field of its pom file." \newline
        "*  versions package-name: Prints a list of the versions of the given package available on clojars.org" \newline
        "*  remove package-name: Removes given package from the clj-repo dependency list, then reinstalls all packages." \newline
-       \newline))
+       \newline
+       "Packages are installed in $HOME/.clj/lib, and can be used by applications other than clj" \newline
+       "by including the jars in that directory on the classpath. For instance, to start a command line " \newline
+       "REPL with jline, run the following command: "\newline\newline
+       "   java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main" \newline\newline))
 
 (defn get-clj-home []
   (let [user-home (System/getProperty "user.home")
@@ -60,6 +64,7 @@
        "                 [org.clojure/clojure-contrib \"1.2.0-SNAPSHOT\"]\n"
        "                 [leiningen \"1.0.0\"]\n"
        "                 [swingrepl \"1.0.0-SNAPSHOT\"]\n"
+       "                 [jline \"0.9.94\"]\n"
        "                 [clojure-http-client \"1.1.0-SNAPSHOT\"]])\n"))
 
 
