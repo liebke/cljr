@@ -11,9 +11,13 @@
 
 (def CLJ-VERSION "1.0.0-SNAPSHOT")
 
-(defn- sep [] (java.io.File/separator))
+(defn sep [] (java.io.File/separator))
 
-(defn- path-sep [] (java.io.File/pathSeparator))
+(defn path-sep [] (java.io.File/pathSeparator))
+
+(def clj-jar "clj.jar")
+
+(def project-clj "project.clj")
 
 
 (defn help-text []
@@ -54,6 +58,10 @@
        \newline
        "*  reload: Reloads all packages listed by 'clj list'." \newline
        \newline
+       "*  add-classpath classpath: Adds classpath to $CLJ_HOME/bin/clj(.bat) files" \newline
+       \newline
+       "*  remove-classpath classpath: Removes classpath from $CLJ_HOME/bin/clj(.bat) files" \newline
+       \newline
        \newline
        "Packages are installed in $CLJ_HOME/lib, and can be used by applications other " \newline
        "than clj by including the jars in that directory on the classpath. For instance, " \newline
@@ -72,46 +80,79 @@
     (or (System/getProperty "clj.home") default-clj-home)))
 
 
-(defn clj-sh-script []
-  (str "#!/bin/sh" \newline
-       "CLJ_HOME=" (get-clj-home) \newline
-       "CLASSPATH=$CLJ_HOME/clj.jar:$CLJ_HOME/lib/'*':.:$CLJ_HOME/src:$CLJ_HOME/script" \newline
-       "if [ \"$1\" = \"repl\" ]; then" \newline
-       "   java -cp \"$CLASSPATH\" -Duser.home=" (get-user-home) " -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main" \newline
-       "else" \newline
-       "   java -cp \"$CLASSPATH\" -Duser.home=" (get-user-home) " -Dclj.home=\"$CLJ_HOME\" clj.main $*" \newline
-       "fi" \newline))
-
-
-(defn clj-bat-script []
-  (let [clj-home (get-clj-home)]
-    (str "@echo off\r\n"
-      "java -Duser.home=" (get-user-home) " -Dclj.home=" (get-clj-home)
-	 " -cp " (get-clj-home) (sep) "lib" (sep) "*" (path-sep) (get-clj-home) (sep) "clj.jar "
-	 "clj.main %* \r\n")))
-
-
-(defn clj-project-clj []
-  (str "(leiningen.core/defproject clj-repo \"1.0.0-SNAPSHOT\" \n"
-       "  :description \"clj is a Clojure REPL and package managment system.\"\n"
-       "  :dependencies [[org.clojure/clojure \"1.2.0-master-SNAPSHOT\"]\n"
-       "                 [org.clojure/clojure-contrib \"1.2.0-SNAPSHOT\"]\n"
-       "                 [leiningen \"1.0.0\"]\n"
-       "                 [swingrepl \"1.0.0-SNAPSHOT\"]\n"
-       "                 [jline \"0.9.94\"]\n"
-       "                 [clojure-http-client \"1.1.0-SNAPSHOT\"]])\n"))
+(defn windows-os? []
+  (.startsWith (System/getProperty "os.name") "Windows"))
 
 
 (defn get-project []
-  (let [project-file (str (get-clj-home) (sep) "project.clj")]
+  (let [project-file (str (get-clj-home) (sep) project-clj)]
     (read-project project-file)))
 
 
 (defn need-to-init?
   ([] (need-to-init? (get-clj-home)))
   ([clj-home]
-     (not (and (.exists (file clj-home "project.clj"))
+     (not (and (.exists (file clj-home project-clj))
 	       (= "clj-repo" (:name (get-project)))))))
+
+
+(defn get-jars-classpath []
+  (let [wildcard (if (windows-os?) "*" "'*'")]
+    (str (get-clj-home) (sep) wildcard)))
+
+
+(defn get-classpath-vector []
+  (if (need-to-init?)
+    [(str (get-clj-home) (sep) clj-jar)
+     ;; (get-jars-classpath)
+     "src" "."]
+    (:classpath (get-project))))
+
+
+(defn get-classpaths
+  ([] (get-classpaths (get-classpath-vector)))
+  ([classpath-vector]
+     (s/join [(apply str (interpose (path-sep) classpath-vector))
+	      (str (path-sep) (get-jars-classpath))])))
+
+
+(defn clj-project-clj
+  ([] (clj-project-clj (get-classpath-vector)))
+  ([classpath-vector]
+    (str "(leiningen.core/defproject clj-repo \"1.0.0-SNAPSHOT\" \n"
+	 "  :description \"clj is a Clojure REPL and package managment system.\"\n"
+	 "  :dependencies [[org.clojure/clojure \"1.2.0-master-SNAPSHOT\"]\n"
+	 "                 [org.clojure/clojure-contrib \"1.2.0-SNAPSHOT\"]\n"
+	 "                 [leiningen \"1.0.0\"]\n"
+	 "                 [swingrepl \"1.0.0-SNAPSHOT\"]\n"
+	 "                 [jline \"0.9.94\"]\n"
+	 "                 [clojure-http-client \"1.1.0-SNAPSHOT\"]]\n"
+	 "  :classpath " classpath-vector ")\n")))
+
+
+(defn clj-sh-script
+  ([] (clj-sh-script (get-classpaths)))
+  ([classpaths]
+     (str "#!/bin/sh\n"
+	  "CLJ_HOME=\"" (get-clj-home) "\" \n" 
+	  "CLASSPATH=\"" classpaths "\" \n"
+	  "if [ \"$1\" = \"repl\" ]; then \n"
+	  "   java -cp \"$CLASSPATH\" -Duser.home=\"" (get-user-home) "\" -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main \n" 
+	  "else \n"
+	  "   java -cp \"$CLASSPATH\" -Duser.home=\"" (get-user-home) "\" -Dclj.home=\"$CLJ_HOME\" clj.main $* \n"
+	  "fi \n")))
+
+
+(defn clj-bat-script
+  ([] (clj-bat-script (get-classpaths)))
+  ([classpaths]
+     (let [clj-home (get-clj-home)]
+       (str "@echo off\r\n"
+	    "set CLASSPATH=\"" classpaths "\"\r\n"
+	    "java -Duser.home=" (get-user-home) " -Dclj.home=" (get-clj-home)
+	    " -cp %CLASSPATH% " 
+	    "clj.main %* \r\n"))))
+
 
 
 (defn clj-reload []
@@ -135,10 +176,10 @@
 	   (println "Initializing clj...")
 	   (println "Creating clj home, " (get-clj-home) "...")
 	   (doseq [d [clj-home clj-lib clj-src clj-bin]] (.mkdirs d))
-	   (println (str "Copying " current-jar " to " clj-home (sep) "clj.jar..."))
-	   (copy current-jar (file clj-home "clj.jar"))
-	   (println (str "Creating " clj-home (sep) "project.clj file..."))
-	   (spit (file clj-home "project.clj") (clj-project-clj))
+	   (println (str "Copying " current-jar " to " clj-home (sep) clj-jar "..."))
+	   (copy current-jar (file clj-home clj-jar))
+	   (println (str "Creating " clj-home (sep) project-clj " file..."))
+	   (spit (file clj-home project-clj) (clj-project-clj))
 	   (println "Creating script files...")
 	   (doto (file clj-bin "clj")
 	     (spit (clj-sh-script))
@@ -153,7 +194,7 @@
 	   (println)
 	   (println "--------------------------------------------------------------------------------")
 	   (println (str "Add " clj-home (sep) "bin to your PATH:" \newline
-			 "export PATH=" clj-home (sep) "bin:$PATH")))
+			 "   export PATH=" clj-home (sep) "bin:$PATH" \newline\newline)))
 	 (println (str "** " clj-home " is already initialized. **"))))))
 
 
@@ -181,7 +222,7 @@
 			":description \"" (:description updated-project) "\"" \newline
 			":dependencies " (:dependencies updated-project) ")")]
       (println "Installing version " library-version " of " library-name "...")
-      (spit (str (get-clj-home) (sep) "project.clj") proj-str)
+      (spit (str (get-clj-home) (sep) project-clj) proj-str)
       (clj-reload))))
 
 
@@ -201,7 +242,7 @@
 		      (:version updated-project) "\"" \newline
 		      ":description \"" (:description updated-project) "\"" \newline
 		      ":dependencies " (:dependencies updated-project) ")")]
-    (spit (str (get-clj-home) (sep) "project.clj") proj-str)
+    (spit (str (get-clj-home) (sep) project-clj) proj-str)
     ;; (clj-clean)
     ;; (clj-reload)
     (println "Remember to run 'clj clean' and 'clj reload' to actually remove packages from the repo.")))
@@ -284,13 +325,43 @@
        (println "\n\n"))))
 
 
+(defn clj-add-classpath
+  ([classpath]
+     (let [classpath-vector (conj (get-classpath-vector) classpath)
+	   classpaths (get-classpaths classpath-vector)]
+       ;; generate a new project.clj
+       (spit (file (str (get-clj-home) (sep) project-clj))
+	     (clj-project-clj classpath-vector))
+       ;; generate a new clj sh script
+       (spit (file (str (get-clj-home) (sep) "bin" (sep) "clj"))
+	     (clj-sh-script classpaths))
+       ;; generate a new clj bat script
+       (spit (file (str (get-clj-home) (sep) "bin" (sep) "clj.bat"))
+	     (clj-bat-script classpaths)))))
+
+
+(defn clj-remove-classpath
+  ([classpath]
+     (let [classpath-vector (into [] (filter #(not= classpath %) (get-classpath-vector)))
+	   classpaths (get-classpaths classpath-vector)]
+       ;; generate a new project.clj
+       (spit (file (str (get-clj-home) (sep) project-clj))
+	     (clj-project-clj classpath-vector))
+       ;; generate a new clj sh script
+       (spit (file (str (get-clj-home) (sep) "bin" (sep) "clj"))
+	     (clj-sh-script classpaths))
+       ;; generate a new clj bat script
+       (spit (file (str (get-clj-home) (sep) "bin" (sep) "clj.bat"))
+	     (clj-bat-script classpaths)))))
+  
+
 (defn clj
   "Provides access to the clj package management system. It uses the same arguments
   as the command line version, using keywords for commands and strings for arguments."
   ([]
-    (if (need-to-init?)
-      (clj :self-install)
-      (clj :repl)))
+     (if (need-to-init?)
+       (clj :self-install)
+       (clj :repl)))
   ([command & args]
      (let [cmd (keyword command)]
        (condp = cmd
@@ -307,6 +378,8 @@
 	   :repl (clj-repl)
 	   :swingrepl (clj-repl)
 	   :run (clj-run args)
+	   :add-classpath (apply clj-add-classpath args)
+	   :remove-classpath (apply clj-remove-classpath args)
 	   :help (println (help-text))
 	   (println "unrecognized command to clj.")))))
 

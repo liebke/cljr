@@ -34,6 +34,8 @@ h2. Documentation
 *  @remove package-name@: Removes given package from the clj-repo package list, must be followed by @clj clean@ and @clj reload@ to actually remove packages from the repository.
 *  @clean@: Removes all packages from @~/.clj/lib@ directory.
 *  @reload@: Reloads all packages listed by @clj list@.
+*  @add-classpath classpath@: Adds classpath to @~/.clj/bin/clj(.bat)@ files.
+*  @remove-classpath classpath@: Removes classpath from @~/.clj/bin/clj(.bat)@ files.
 
 
 Packages are installed in @$HOME/.clj/lib@, and can be used by applications other than @clj@
