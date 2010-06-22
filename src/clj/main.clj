@@ -97,8 +97,7 @@
 
 
 (defn get-jars-classpath []
-  (let [wildcard (if (windows-os?) "*" "'*'")]
-    (str (get-clj-home) (sep) wildcard)))
+  (str (get-clj-home) (sep) "lib" (sep) "*"))
 
 
 (defn get-classpath-vector []
@@ -137,9 +136,9 @@
 	  "CLJ_HOME=\"" (get-clj-home) "\" \n" 
 	  "CLASSPATH=\"" classpaths "\" \n"
 	  "if [ \"$1\" = \"repl\" ]; then \n"
-	  "   java -cp \"$CLASSPATH\" -Duser.home=\"" (get-user-home) "\" -Dclj.home=\"$CLJ_HOME\" jline.ConsoleRunner clojure.main \n" 
+	  "   java -cp $CLASSPATH -Duser.home=\"" (get-user-home) "\" -Dclj.home=$CLJ_HOME jline.ConsoleRunner clojure.main \n" 
 	  "else \n"
-	  "   java -cp \"$CLASSPATH\" -Duser.home=\"" (get-user-home) "\" -Dclj.home=\"$CLJ_HOME\" clj.main $* \n"
+	  "   java -cp $CLASSPATH -Duser.home=\"" (get-user-home) "\" -Dclj.home=$CLJ_HOME clj.main $* \n"
 	  "fi \n")))
 
 
@@ -167,7 +166,8 @@
 	   clj-bin (file clj-home "bin")
 	   current-jar  (file (first
 			       (filter
-				#(.endsWith % (str "clj-" CLJ-VERSION "-standalone.jar"))
+				#(or (.endsWith % (str "clj-standalone.jar"))
+				     (.endsWith % (str "clj-" CLJ-VERSION "-standalone.jar")))
 				(s/split (System/getProperty "java.class.path")
 					 (re-pattern (path-sep))))))]
        (if (need-to-init? clj-home)
