@@ -1,4 +1,6 @@
 
+<img src="http://incanter.org/images/clj/clj.png" height="100" />
+
 h2. Quick start
 
 *clj* is a Clojure REPL and package management system.
