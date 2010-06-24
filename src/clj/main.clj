@@ -48,7 +48,7 @@
        "   package as found in the description field of its pom file." \newline
        \newline
        "*  versions package-name: Prints a list of the versions of the given package " \newline
-       "   available on clojars.org" \newline
+       "   available on clojars.org." \newline
        \newline
        "*  remove package-name: Removes given package from the clj-repo package list, " \newline
        "   must be followed by 'clj clean' and 'clj reload' to actually remove packages " \newline
@@ -56,11 +56,13 @@
        \newline
        "*  clean: Removes all packages from $CLJ_HOME/lib directory." \newline
        \newline
-       "*  reload: Reloads all packages listed by 'clj list'." \newline
+       "*  reload: Reloads all packages in the clj repository." \newline
        \newline
-       "*  add-classpath classpath: Adds classpath to $CLJ_HOME/bin/clj(.bat) files" \newline
+       "*  add-classpath classpath: Adds classpath to $CLJ_HOME/bin/clj(.bat) files." \newline
        \newline
-       "*  remove-classpath classpath: Removes classpath from $CLJ_HOME/bin/clj(.bat) files" \newline
+       "*  remove-classpath classpath: Removes classpath from $CLJ_HOME/bin/clj(.bat) files." \newline
+       \newline
+       "*  list-jars: Prints a list of jars in the clj repository." \newline
        \newline
        \newline
        "Packages are installed in $CLJ_HOME/lib, and can be used by applications other " \newline
@@ -126,7 +128,8 @@
 	 "                 [swingrepl \"1.0.0-SNAPSHOT\"]\n"
 	 "                 [jline \"0.9.94\"]\n"
 	 "                 [clojure-http-client \"1.1.0-SNAPSHOT\"]]\n"
-	 "  :classpath " classpath-vector ")\n")))
+	 "  :classpath " classpath-vector "\n"
+	 "  :main clj.main)\n")))
 
 
 (defn clj-sh-script
@@ -152,6 +155,31 @@
 	    " -cp %CLASSPATH% " 
 	    "clj.main %* \r\n"))))
 
+
+(defn clj-list-jars
+  ([] (clj-list-jars (get-clj-home)))
+  ([clj-home]
+     (let [clj-repo (file clj-home "lib")]
+       (if-not (.isDirectory clj-repo)
+	 (println "The " clj-home (sep) "lib repository does not exist, needs to be initialized.")
+	 (let [files (seq (.listFiles clj-repo))]
+	   (println "\n\nList of jar files in the clj repository:\n")
+	   (println "--------------------------------------------------------------------------------")
+	   (doseq [f files] (println (.getName f)))
+	   (println "\n\n"))))))
+
+
+(defn add-clj-repo-to-classpath
+  ([] (add-clj-repo-to-classpath (get-clj-home)))
+  ([clj-home]
+     (let [clj-repo (file clj-home "lib")]
+       (if-not (.isDirectory clj-repo)
+	 (println "The " clj-home (sep) "lib repository does not exist, needs to be initialized.")
+	 (let [files (seq (.listFiles clj-repo))
+	       urls (map #(-> % .toURI .toURL) files)
+	       previous-classloader (.getContextClassLoader (Thread/currentThread))
+	       current-classloader (java.net.URLClassLoader/newInstance (into-array urls) previous-classloader)]
+	   (.setContextClassLoader (Thread/currentThread) current-classloader))))))
 
 
 (defn clj-reload []
@@ -380,10 +408,13 @@
 	   :run (clj-run args)
 	   :add-classpath (apply clj-add-classpath args)
 	   :remove-classpath (apply clj-remove-classpath args)
+	   :list-jars (clj-list-jars)
 	   :help (println (help-text))
 	   (println "unrecognized command to clj.")))))
 
 
 (defn -main
-  ([& args] (apply clj args)))
+  ([& args]
+     (add-clj-repo-to-classpath)
+     (apply clj args)))
 
