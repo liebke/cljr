@@ -87,8 +87,10 @@
 
 
 (defn get-project []
-  (let [project-file (str (get-clj-home) (sep) project-clj)]
-    (read-project project-file)))
+  (let [project-file (file (str (get-clj-home) (sep) project-clj))]
+    (if (.exists project-file)
+      (read-project (.getAbsolutePath project-file))
+      (println (get-clj-home) (sep) "project.clj does not exist, clj must be initialized."))))
 
 
 (defn need-to-init?
@@ -108,6 +110,11 @@
      ;; (get-jars-classpath)
      "src" "."]
     (:classpath (get-project))))
+
+
+(defn get-classpath-urls
+  [classpath-vector]
+  (map #(-> % file .toURI .toURL) classpath-vector))
 
 
 (defn get-classpaths
@@ -170,13 +177,17 @@
 
 
 (defn add-clj-repo-to-classpath
-  ([] (add-clj-repo-to-classpath (get-clj-home)))
-  ([clj-home]
+  ([] (add-clj-repo-to-classpath (get-clj-home) (:classpath (get-project))))
+  ([clj-home additional-classpaths]
      (let [clj-repo (file clj-home "lib")]
        (if-not (.isDirectory clj-repo)
 	 (println "The " clj-home (sep) "lib repository does not exist, needs to be initialized.")
-	 (let [files (seq (.listFiles clj-repo))
-	       urls (map #(-> % .toURI .toURL) files)
+	 (let [additional-paths (get-classpath-urls (get-classpath-vector))
+	       jar-files (seq (.listFiles clj-repo))
+	       all-paths (if additional-classpaths
+			   (flatten (conj jar-files additional-paths))
+			   jar-files)
+	       urls (map #(-> % .toURI .toURL) all-paths)
 	       previous-classloader (.getContextClassLoader (Thread/currentThread))
 	       current-classloader (java.net.URLClassLoader/newInstance (into-array urls) previous-classloader)]
 	   (.setContextClassLoader (Thread/currentThread) current-classloader))))))

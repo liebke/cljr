@@ -3,4 +3,5 @@
 lein deps
 lein uberjar
 java -jar clj-standalone.jar self-install
+cp clj-standalone.jar clj-1.0.0-SNAPSHOT-standalone.jar
 
