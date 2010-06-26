@@ -167,7 +167,7 @@
 	  "   java -cp \"" (get-clj-home) (sep) clj-jar "\" "
 	  "-Duser.home=\"" (get-user-home) "\" "
 	  "-Dclj.home=$CLJ_HOME jline.ConsoleRunner clojure.main "
-	  " -e \"(require 'clj.main) (clj.main/add-clj-repo-to-classpath)\" -r "
+	  " -e \"(require 'clj.main) (clj.main/initialize-classpath)\" -r "
 	  "\n" 
 	  "else \n"
 	  "   java -cp \"" (get-clj-home) (sep) clj-jar "\" "
@@ -197,8 +197,8 @@
 	   (println "\n\n"))))))
 
 
-(defn add-clj-repo-to-classpath
-  ([] (add-clj-repo-to-classpath (get-clj-home) (:classpath (get-project))))
+(defn initialize-classpath
+  ([] (initialize-classpath (get-clj-home) (:classpath (get-project))))
   ([clj-home additional-classpaths]
      (when @classpath-uninitialized?
        (let [clj-repo (file clj-home "lib")]
@@ -214,7 +214,7 @@
 		 current-classloader (java.net.URLClassLoader/newInstance (into-array urls) previous-classloader)]
 	     (.setContextClassLoader (Thread/currentThread) current-classloader)
 	     (dosync (ref-set classpath-uninitialized? false))
-	     (println "Clojure Classpath initialized by clj.")))))))
+	     (println "Clojure classpath initialized by clj.")))))))
 
 
 (defn clj-reload []
@@ -414,7 +414,7 @@
        (clj :self-install)
        (clj :repl)))
   ([command & args]
-     (add-clj-repo-to-classpath)
+     (initialize-classpath)
      (let [cmd (keyword command)]
        (condp = cmd
 	   :self-install (clj-self-install)
