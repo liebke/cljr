@@ -70,10 +70,10 @@
        \newline
        "*  classpath: Prints classpath." \newline
        \newline
-       "*  add-classpath classpath: Adds classpath to environment. Directories should have a " \newline
-       "   trainling / to distinguish them from jar files." \newline
+       "*  add-classpath dir-or-jar: Adds directory or jar file to the classpath." \newline
+       "   Directories should have a trailing / to distinguish them from jar files." \newline
        \newline
-       "*  remove-classpath classpath: Removes classpath from environment. " \newline
+       "*  remove-classpath dir-or-jar: Removes a directory or jar file from the classpath." \newline
        "   Remember to include trailing / for directories." \newline
        \newline
        "*  list-jars: Prints a list of jars in the clj repository." \newline
