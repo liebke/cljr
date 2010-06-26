@@ -152,11 +152,11 @@
   ([] (project-clj-str base-dependencies
 		       (get-classpath-vector)))
   ([dependency-vector classpath-vector]
-    (str "(leiningen.core/defproject clj-repo \"1.0.0-SNAPSHOT\" \n"
-	 "  :description \"clj is a Clojure REPL and package managment system.\"\n"
-	 "  :dependencies " dependency-vector "\n"
-	 "  :classpath " classpath-vector "\n"
-	 "  :main clj.main)\n")))
+     (pr-str `(leiningen.core/defproject clj-repo "1.0.0-SNAPSHOT"
+	       :description "clj is a Clojure REPL and package management system."
+	       :dependencies ~dependency-vector
+	       :classpath ~classpath-vector
+	       :main clj.main))))
 
 
 (defn clj-sh-script
