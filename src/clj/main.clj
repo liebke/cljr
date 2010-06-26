@@ -3,8 +3,7 @@
         [leiningen.deps :only (deps)]
 	[leiningen.clean :only (empty-directory)]
 	[clojure-http.client :only (request)]
-        [clojure.java.io :only (file copy)]
-        [swank.swank :only (start-repl)])
+        [clojure.java.io :only (file copy)])
   (:require org.dipert.swingrepl.main
 	    [clojure.string :as s])
   (:gen-class))
@@ -233,8 +232,7 @@
 	   clj-bin (file clj-home "bin")
 	   current-jar  (file (first
 			       (filter
-				#(or (.endsWith % (str "clj-standalone.jar"))
-				     (.endsWith % (str "clj-" CLJ-VERSION "-standalone.jar")))
+				#(re-find (re-pattern (str "clj(\\.|-" CLJ-VERSION "-standalone\\.|-standalone\\.)(jar|zip)")) %)
 				(s/split (System/getProperty "java.class.path")
 					 (re-pattern (path-sep))))))]
        (if (need-to-init? clj-home)
@@ -410,14 +408,33 @@
 	     (project-clj-str (get-dependencies) classpath-vector)))))
   
 
-(defn clj-swank
-  ([]
-     (clj-swank 4005))
-  ([port]
-     (cond
-      (integer? port) (start-repl port)
-      (string? port) (start-repl (Integer/parseInt port 10))
-      :else (println "Invalid port number."))))
+(defn abort [msg]
+  (println msg)
+  (System/exit 1))
+
+
+(defn task-not-found [& _]
+  (abort "That's not a task. Use \"clj help\" to list all tasks."))
+
+
+(defn resolve-task [task]
+  (let [task-ns (symbol (str "clj." task))
+        task (symbol task)]
+    (try
+     (when-not (find-ns task-ns)
+       (require task-ns))
+     (or (ns-resolve task-ns task)
+         #'task-not-found)
+     (catch java.io.FileNotFoundException e
+       #'task-not-found))))
+
+
+(defn run-clj-task
+  [& [task-name & args]]
+  (let [task (resolve-task task-name)
+               value (apply task args)]
+           (when (integer? value)
+             (System/exit value))))
 
 
 (defn clj
@@ -448,7 +465,7 @@
 	   :add-classpath (apply clj-add-classpath args)
 	   :remove-classpath (apply clj-remove-classpath args)
 	   :list-jars (clj-list-jars)
-           :swank (apply clj-swank args)
+           :swank (apply run-clj-task "swank" args)
 	   :help (println (help-text))
 	   (println "unrecognized command to clj.")))))
 
