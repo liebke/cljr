@@ -2,7 +2,7 @@
 <img src="http://incanter.org/images/clj/clj.png" height="100" />
 
 
-<b>Clj</b> is a Clojure REPL and package management system. It's designed to complement the project-oriented approach of dependency management systems like <a href="http://github.com/technomancy/leiningen">Leiningen</a> and Maven, both of which are my preferred tools for managing traditional-project dependencies. However, much of what I use Clojure for, including <a href="http://incanter.org">Incanter</a>-based data analysis, is not really project-oriented. In these cases, it is more convenient to have access to a REPL (and soon Swank server) backed by a global package-management system. 
+<b>Clj</b> is a Clojure REPL and package management system. It's designed to complement the project-oriented approach of dependency management systems like <a href="http://github.com/technomancy/leiningen">Leiningen</a> and Maven, both of which are my preferred tools for managing traditional-project dependencies. However, much of what I use Clojure for, including <a href="http://incanter.org">Incanter</a>-based data analysis, is not really project-oriented. In these cases, it is more convenient to have access to a REPL (and Swank server) backed by a global package-management system. 
 
 Another goal of the clj project is to improve the out-of-box experience for Clojure. There are many approaches to helping people get started with Clojure, from the streamlined starter-pack called <a href="http://github.com/russolsen/dejour">Dejour</a>, which only includes Clojure and Clojure-contrib, to the full-monty approach of <a href="http://github.com/relevance/labrepl">labrepl</a>, which includes several additional Clojure libraries, instructions for configuring every available Clojure IDE plugin, and web-based Clojure tutorials. 
 
@@ -36,6 +36,7 @@ h2. Documentation
 *Available commands*
 *  @repl@: Starts a Clojure repl.
 *  @swingrepl@: Starts a Clojure swingrepl.
+*  @swank [port]@: Start a local swank server on port 4005 (or as specified).
 *  @run filename@: Runs the given Clojure file.
 *  @list@: Prints a list of installed packages.
 *  @search term@: Prints a list of packages on clojars.org with names that contain the given search term.

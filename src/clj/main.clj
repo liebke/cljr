@@ -3,7 +3,8 @@
         [leiningen.deps :only (deps)]
 	[leiningen.clean :only (empty-directory)]
 	[clojure-http.client :only (request)]
-        [clojure.java.io :only (file copy)])
+        [clojure.java.io :only (file copy)]
+        [swank.swank :only (start-repl)])
   (:require org.dipert.swingrepl.main
 	    [clojure.string :as s])
   (:gen-class))
@@ -27,7 +28,8 @@
 			['leiningen "1.0.0"]
 			['swingrepl "1.0.0-SNAPSHOT"]
 			['jline "0.9.94"]
-			['clojure-http-client "1.1.0-SNAPSHOT"]])
+			['clojure-http-client "1.1.0-SNAPSHOT"]
+                        ['swank-clojure "1.2.1"]])
 
 
 (defn help-text []
@@ -43,6 +45,8 @@
        "*  repl: Starts a Clojure repl." \newline
        \newline
        "*  swingrepl: Starts a Clojure swingrepl." \newline
+       \newline
+       "*  swank [port]: Start a local swank server on port 4005 (or as specified)."
        \newline
        "*  run filename: Runs the given Clojure file." \newline
        \newline
@@ -406,6 +410,16 @@
 	     (project-clj-str (get-dependencies) classpath-vector)))))
   
 
+(defn clj-swank
+  ([]
+     (clj-swank 4005))
+  ([port]
+     (cond
+      (integer? port) (start-repl port)
+      (string? port) (start-repl (Integer/parseInt port 10))
+      :else (println "Invalid port number."))))
+
+
 (defn clj
   "Provides access to the clj package management system. It uses the same arguments
   as the command line version, using keywords for commands and strings for arguments."
@@ -434,6 +448,7 @@
 	   :add-classpath (apply clj-add-classpath args)
 	   :remove-classpath (apply clj-remove-classpath args)
 	   :list-jars (clj-list-jars)
+           :swank (apply clj-swank args)
 	   :help (println (help-text))
 	   (println "unrecognized command to clj.")))))
 
