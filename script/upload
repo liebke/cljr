@@ -1,0 +1,3 @@
+#!/bin/sh
+
+scp clj.jar clj-1.0.0-SNAPSHOT-standalone.jar liebke@incanter.org:/home/content/l/i/e/liebke/html/downloads

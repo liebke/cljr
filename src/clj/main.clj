@@ -1,34 +1,13 @@
 (ns clj.main
-  (:use [leiningen.core :only (read-project)]
+  (:use [clj internal clojars]
         [leiningen.deps :only (deps)]
 	[leiningen.clean :only (empty-directory)]
-	[clojure-http.client :only (request)]
         [clojure.java.io :only (file copy)])
   (:require org.dipert.swingrepl.main
 	    [clojure.string :as s])
   (:gen-class))
 
 
-(def CLJ-VERSION "1.0.0-SNAPSHOT")
-
-(defn sep [] (java.io.File/separator))
-
-(defn path-sep [] (java.io.File/pathSeparator))
-
-(def clj-jar "clj.jar")
-
-(def project-clj "project.clj")
-
-(def classpath-uninitialized? (ref true))
-
-
-(def base-dependencies [['org.clojure/clojure "1.2.0-master-SNAPSHOT"]
-			['org.clojure/clojure-contrib "1.2.0-SNAPSHOT"]
-			['leiningen "1.0.0"]
-			['swingrepl "1.0.0-SNAPSHOT"]
-			['jline "0.9.94"]
-			['clojure-http-client "1.1.0-SNAPSHOT"]
-                        ['swank-clojure "1.2.1"]])
 
 
 (defn help-text []
@@ -45,17 +24,17 @@
        \newline
        "*  swingrepl: Starts a Clojure swingrepl." \newline
        \newline
-       "*  swank [port]: Start a local swank server on port 4005 (or as specified)."
+       "*  swank [port]: Start a local swank server on port 4005 (or as specified)." \newline
        \newline
        "*  run filename: Runs the given Clojure file." \newline
        \newline
        "*  list: Prints a list of installed packages." \newline
        \newline
-       "*  search term: Prints a list of packages on clojars.org with names that contain " \newline
-       "   the given search term." \newline
-       \newline
        "*  install package-name [package-version]: Installs the given package from " \newline
        "   clojars.org, defaulting to the inferred latest version." \newline
+       \newline
+       "*  search term: Prints a list of packages on clojars.org with names that contain " \newline
+       "   the given search term." \newline
        \newline
        "*  describe package-name [package-version]: Prints the description of the given " \newline
        "   package as found in the description field of its pom file." \newline
@@ -92,101 +71,6 @@
        \newline))
 
 
-(defn get-user-home []
-  (System/getProperty "user.home"))
-
-
-(defn get-clj-home []
-  (let [default-clj-home (str (get-user-home) (sep) ".clj")]
-    (or (System/getProperty "clj.home") default-clj-home)))
-
-
-(defn clj-lib-dir []
-  (str (get-clj-home) (sep) "lib" (sep)))
-
-
-(defn windows-os? []
-  (.startsWith (System/getProperty "os.name") "Windows"))
-
-
-(defn get-project []
-  (let [project-file (file (str (get-clj-home) (sep) project-clj))]
-    (if (.exists project-file)
-      (read-project (.getAbsolutePath project-file))
-      (println (get-clj-home) (sep) "project.clj does not exist, clj must be initialized."))))
-
-
-(defn need-to-init?
-  ([] (need-to-init? (get-clj-home)))
-  ([clj-home]
-     (not (and (.exists (file clj-home project-clj))
-	       (= "clj-repo" (:name (get-project)))))))
-
-
-(defn get-jars-classpath []
-  (str (clj-lib-dir) "*"))
-
-
-(defn get-classpath-vector []
-  (if (need-to-init?)
-    [(str (get-clj-home) (sep) clj-jar)
-     ;; (get-jars-classpath)
-     "./src/" "./"]
-    (vec (:classpath (get-project)))))
-
-
-(defn get-dependencies []
-  (:dependencies (get-project)))
-
-
-(defn get-classpath-urls
-  [classpath-vector]
-  (map #(-> % file .toURI .toURL) classpath-vector))
-
-
-(defn get-classpaths
-  ([] (get-classpaths (get-classpath-vector)))
-  ([classpath-vector]
-     (s/join [(apply str (interpose (path-sep) classpath-vector))
-	      (str (path-sep) (get-jars-classpath))])))
-
-
-(defn project-clj-str
-  ([] (project-clj-str base-dependencies
-		       (get-classpath-vector)))
-  ([dependency-vector classpath-vector]
-     (pr-str `(leiningen.core/defproject clj-repo "1.0.0-SNAPSHOT"
-	       :description "clj is a Clojure REPL and package management system."
-	       :dependencies ~dependency-vector
-	       :classpath ~classpath-vector
-	       :main clj.main))))
-
-
-(defn clj-sh-script
-  ([]
-     (str "#!/bin/sh\n"
-	  "CLJ_HOME=\"" (get-clj-home) "\" \n" 
-	  "if [ \"$1\" = \"repl\" ]; then \n"
-	  "   java -cp \"" (get-clj-home) (sep) clj-jar "\" "
-	  "-Duser.home=\"" (get-user-home) "\" "
-	  "-Dclj.home=$CLJ_HOME jline.ConsoleRunner clojure.main "
-	  " -e \"(require 'clj.main) (clj.main/initialize-classpath)\" -r "
-	  "\n" 
-	  "else \n"
-	  "   java -cp \"" (get-clj-home) (sep) clj-jar "\" "
-	  "-Duser.home=\"" (get-user-home) "\" -Dclj.home=$CLJ_HOME clj.main $* \n"
-	  "fi \n")))
-
-
-(defn clj-bat-script
-  ([]
-     (let [clj-home (get-clj-home)]
-       (str "@echo off\r\n"
-	    "java -cp \"" (get-clj-home) (sep) clj-jar "\" "
-	    "-Duser.home=" (get-user-home) " -Dclj.home=" (get-clj-home)
-	    " clj.main %* \r\n"))))
-
-
 (defn clj-list-jars
   ([] (clj-list-jars (get-clj-home)))
   ([clj-home]
@@ -218,6 +102,21 @@
 	     (.setContextClassLoader (Thread/currentThread) current-classloader)
 	     (dosync (ref-set classpath-uninitialized? false))
 	     (println "Clojure classpath initialized by clj.")))))))
+
+
+(defn clj-remove [library-name]
+  (let [project (get-project)
+	dependencies (:dependencies project)
+	updated-project (assoc project :dependencies
+			       (into [] (filter #(not= (symbol library-name)
+						       (first %))
+						dependencies)))
+	proj-str (project-clj-str (:dependencies updated-project)
+				  (get-classpath-vector))]
+    (spit (str (get-clj-home) (sep) project-clj) proj-str)
+    ;; (clj-clean)
+    ;; (clj-reload)
+    (println "Remember to run 'clj clean' and 'clj reload' to actually remove packages from the repo.")))
 
 
 (defn clj-reload []
@@ -263,48 +162,9 @@
 	 (println (str "** " clj-home " is already initialized. **"))))))
 
 
-(defn get-latest-version [library-name]
-  (let [response (request "http://clojars.org/repo/all-jars.clj")
-	lib-name (symbol library-name)]
-    (second (last (filter #(= (first %) lib-name)
-			  (for [line (:body-seq response)]
-			    (read-string line)))))))
-
-
-(defn clj-install
-  ([library-name]
-    (clj-install library-name (get-latest-version library-name)))
-  ([library-name library-version]
-    (let [project (get-project)
-	  dependencies (:dependencies project)
-	  updated-project (assoc project :dependencies
-				 (conj dependencies
-				       [(symbol library-name)
-					library-version]))
-	  proj-str (project-clj-str (:dependencies updated-project)
-				    (get-classpath-vector))]
-      (println "Installing version " library-version " of " library-name "...")
-      (spit (str (get-clj-home) (sep) project-clj) proj-str)
-      (clj-reload))))
-
 
 (defn clj-clean []
   (empty-directory (file (:library-path (get-project))) true))
-
-
-(defn clj-remove [library-name]
-  (let [project (get-project)
-	dependencies (:dependencies project)
-	updated-project (assoc project :dependencies
-			       (into [] (filter #(not= (symbol library-name)
-						       (first %))
-						dependencies)))
-	proj-str (project-clj-str (:dependencies updated-project)
-				  (get-classpath-vector))]
-    (spit (str (get-clj-home) (sep) project-clj) proj-str)
-    ;; (clj-clean)
-    ;; (clj-reload)
-    (println "Remember to run 'clj clean' and 'clj reload' to actually remove packages from the repo.")))
 
 
 (defn clj-classpath []
@@ -341,55 +201,6 @@
     (doseq [repo repos]
       (println "  " (first repo) "  " (second repo)))
     (println "\n\n")))
-
-
-(defn clj-search [term]
-  (let [response (request "http://clojars.org/repo/all-jars.clj")]
-    (println "\n\nLibraries on Clojars.org that contain the term: " term)
-    (println "--------------------------------------------------------------------------------")
-    (doseq [entry (for [line (:body-seq response) :when (.contains line term)]
-		    (read-string line))]
-      (println "  " (first entry) "  " (second entry)))
-    (println "\n\n")))
-
-
-(defn clj-versions [library-name]
-  (let [response (request "http://clojars.org/repo/all-jars.clj")]
-    (println "\n\nAvailable versions for library: " library-name)
-    (println "--------------------------------------------------------------------------------")
-    (doseq [entry (filter #(= (first %) (symbol library-name))
-			  (for [line (:body-seq response)]
-			    (read-string line)))]
-      (println "  " (first entry) "  " (second entry)))
-    (println "\n\n")))
-
-
-(defn get-description [id-str]
-  (let [response (request (str "http://clojars.org/repo/" id-str))]
-    (-> (apply str
-	       (for [line (:body-seq response)
-		     :when (.contains line "<description>")]
-		 line))
-	s/trim
-	(s/replace "<description>" "")
-	(s/replace "</description>" ""))))
-
-
-(defn clj-describe
-  ([library-name]
-     (clj-describe library-name (get-latest-version library-name)))
-  ([library-name version]
-     (let [response (request "http://clojars.org/repo/all-poms.txt")
-	   id-str (if (.contains library-name "/")
-		    (str "./" library-name "/" version)
-		    (str "./" library-name "/" library-name "/" version))]
-       (println (str "\n\nDescription for library: " library-name "  " version))
-       (println "--------------------------------------------------------------------------------")
-       (println (get-description
-		 (last (for [line (:body-seq response)
-			     :when (.startsWith line id-str)]
-			 line))))
-       (println "\n\n"))))
 
 
 (defn clj-add-classpath
@@ -444,30 +255,30 @@
      (if (need-to-init?)
        (clj :self-install)
        (clj :repl)))
-  ([command & args]
+  ([& args]
      (initialize-classpath)
-     (let [cmd (keyword command)]
+     (let [cmd (keyword (first args))
+	   opts (rest args)]
        (condp = cmd
 	   :self-install (clj-self-install)
 	   :reload (clj-reload)
 	   :list (clj-list)
 	   :list-repos (clj-list-repos)
-	   :install (apply clj-install args)
-	   :remove (apply clj-remove args)
+	   :install (apply clojars-install opts)
+	   :remove (apply clj-remove opts)
 	   :clean (clj-clean)
-	   :search (apply clj-search args)
-	   :versions (apply clj-versions args)
-	   :describe (apply clj-describe args)
+	   :search (apply clojars-search opts)
+	   :versions (apply clojars-versions opts)
+	   :describe (apply clojars-describe opts)
 	   :repl (clj-repl)
 	   :swingrepl (clj-repl)
-	   :run (clj-run args)
+	   :run (clj-run opts)
 	   :classpath (clj-classpath)
-	   :add-classpath (apply clj-add-classpath args)
-	   :remove-classpath (apply clj-remove-classpath args)
+	   :add-classpath (apply clj-add-classpath opts)
+	   :remove-classpath (apply clj-remove-classpath opts)
 	   :list-jars (clj-list-jars)
-           :swank (apply run-clj-task "swank" args)
 	   :help (println (help-text))
-	   (println "unrecognized command to clj.")))))
+	   (apply run-clj-task (name cmd) opts)))))
 
 
 (defn -main
