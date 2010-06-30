@@ -52,7 +52,10 @@
        \newline
        "*  classpath: Prints classpath." \newline
        \newline
-       "*  add-classpath dir-or-jar: Adds directory or jar file to the classpath." \newline
+       "*  add-classpath dir-or-jar(s): Adds directories or jar files to the classpath." \newline
+       "   Directories should have a trailing / to distinguish them from jar files." \newline
+       \newline
+       "*  add-jar jar file(s): Copies jar files to the clj repository." \newline
        "   Directories should have a trailing / to distinguish them from jar files." \newline
        \newline
        "*  remove-classpath dir-or-jar: Removes a directory or jar file from the classpath." \newline
@@ -162,6 +165,13 @@
 	 (println (str "** " clj-home " is already initialized. **"))))))
 
 
+(defn clj-add-jars [& jar-files]
+  (println "Copying jar files to clj repository...")
+  (let [clj-lib (file (clj-lib-dir))
+	files (map file jar-files)]
+    (doseq [f files]
+     (copy (file f) (file clj-lib (.getName f))))))
+
 
 (defn clj-clean []
   (empty-directory (file (:library-path (get-project))) true))
@@ -204,8 +214,8 @@
 
 
 (defn clj-add-classpath
-  ([classpath]
-     (let [classpath-vector (conj (get-classpath-vector) classpath)]
+  ([& classpath]
+     (let [classpath-vector (flatten (conj (get-classpath-vector) classpath))]
        ;; generate a new project.clj
        (spit (file (str (get-clj-home) (sep) project-clj))
 	     (project-clj-str (get-dependencies) classpath-vector)))))
@@ -275,6 +285,7 @@
 	   :run (clj-run opts)
 	   :classpath (clj-classpath)
 	   :add-classpath (apply clj-add-classpath opts)
+	   :add-jars (apply clj-add-jars opts)
 	   :remove-classpath (apply clj-remove-classpath opts)
 	   :list-jars (clj-list-jars)
 	   :help (println (help-text))
