@@ -52,10 +52,10 @@
        \newline
        "*  classpath: Prints classpath." \newline
        \newline
-       "*  add-classpath dir-or-jar(s): Adds directories or jar files to the classpath." \newline
+       "*  add-classpath dirs-or-jars: Adds directories or jar files to the classpath." \newline
        "   Directories should have a trailing / to distinguish them from jar files." \newline
        \newline
-       "*  add-jar jar file(s): Copies jar files to the clj repository." \newline
+       "*  add-jars jar file(s): Copies jar files to the clj repository." \newline
        "   Directories should have a trailing / to distinguish them from jar files." \newline
        \newline
        "*  remove-classpath dir-or-jar: Removes a directory or jar file from the classpath." \newline

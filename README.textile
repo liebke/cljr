@@ -47,7 +47,8 @@ h2. Documentation
 *  @clean@: Removes all packages from @~/.clj/lib@ directory.
 *  @reload@: Reloads all packages listed by @clj list@.
 *  @classpath@: Prints classpath.
-*  @add-classpath dir-or-jarfile@: Adds directory or jar file to the classpath. Directories should have a trailing / to distinguish them from jar files. 
+*  @add-classpath dirs-or-jarfiles@: Adds directories or jar files to the classpath. Directories should have a trailing / to distinguish them from jar files. 
+*  @add-jars jar file(s)@: Copies jar files to the clj repository. Directories should have a trailing / to distinguish them from jar files."
 *  @remove-classpath dir-or-jarfile@:  Removes a directory or jar file from the classpath. Remember to include trailing / for directories.
 
 
