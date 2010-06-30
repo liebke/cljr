@@ -33,3 +33,16 @@
   ([url]
      (body-seq (get-http-connection url))))
 
+
+
+(defn set-system-proxy!
+  "Java's HttpURLConnection cannot do per-request proxying. Instead,
+  system properties are used. This function mutates the global setting.
+  For per-request proxying, use the Apache HTTP client."
+  [#^String host port]
+  (doto (System/getProperties)
+    (.setProperty "http.proxyHost" host)
+    (.setProperty "http.proxyPort" (str port)))
+  nil)
+
+
