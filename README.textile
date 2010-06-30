@@ -16,8 +16,8 @@ h2. Quick start
 
 
 *Install*
-# Download <a href="http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar">http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar</a>
-# Run @java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+# Download <a href="http://incanter.org/downloads/clj.jar">http://incanter.org/downloads/clj.jar</a>
+# Run @java -jar clj.jar self-install@ (note: your browser may have added a .zip extension to the jar during download)
 # Copy @~/.clj/bin/clj(.bat)@ to your path
 
 *Try it out*
