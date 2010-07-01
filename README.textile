@@ -17,8 +17,8 @@ h2. Quick start
 
 *Install*
 # Download <a href="http://incanter.org/downloads/clj.jar">http://incanter.org/downloads/clj.jar</a>
-# Run @java -jar clj.jar self-install@ (note: your browser may have added a .zip extension to the jar during download)
-# Copy @~/.clj/bin/clj(.bat)@ to your path
+# Run @java -jar clj.jar self-install@ Note: 1) Requires java 1.6 and 2) if your browser added a .zip extension to the jar during download, just run @java -jar clj.jar.zip self-install@.
+# Copy @~/.clj/bin/clj@ or @~/.clj/bin/clj.bat@ to your path
 
 *Try it out*
 # Run @clj list@ to see what packages are installed.
@@ -48,7 +48,7 @@ h2. Documentation
 *  @reload@: Reloads all packages listed by @clj list@.
 *  @classpath@: Prints classpath.
 *  @add-classpath dirs-or-jarfiles@: Adds directories or jar files to the classpath. Directories should have a trailing / to distinguish them from jar files. 
-*  @add-jars jar file(s)@: Copies jar files to the clj repository. Directories should have a trailing / to distinguish them from jar files."
+*  @add-jars jar file(s)@: Copies jar files to the clj repository."
 *  @remove-classpath dir-or-jarfile@:  Removes a directory or jar file from the classpath. Remember to include trailing / for directories.
 
 
@@ -60,13 +60,13 @@ REPL with jline, run the following command:
    @java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main@
 
 *Installation*
-Download the <a href="http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar">clj.jar</a> file (or follow the instructions below to build from source):
+Download the <a href="http://incanter.org/downloads/clj.jar">clj.jar</a> file (or follow the instructions below to build from source):
 
-@wget http://incanter.org/downloads/clj-1.0.0-SNAPSHOT-standalone.jar@
+@wget http://incanter.org/downloads/clj.jar@
 
 and either double-click on the jar file to run self-install, or run the self-install command from the command line:
 
-@java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+@java -jar clj.jar self-install@
 
 
 *Self-install will*
