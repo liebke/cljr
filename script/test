@@ -1,21 +1,21 @@
 #!/bin/sh
 
-clj help
-clj list
-clj search incanter
-clj describe incanter
-clj versions incanter
-clj install incanter
-clj list
-clj add-classpath /Users/dliebke/Desktop/dev/incanter
-clj classpath
-clj list-jars
-clj run ~/Desktop/dev/incanter/run_prob_plots.clj
-clj repl
-clj swingrepl
-clj swank
-clj remove-classpath /Users/dliebke/Desktop/dev/incanter
-clj remove incanter
-clj list
-clj clean
-clj reload
+cljr help
+cljr list
+cljr search incanter
+cljr describe incanter
+cljr versions incanter
+cljr install incanter
+cljr list
+cljr add-classpath /Users/dliebke/Desktop/dev/incanter
+cljr classpath
+cljr list-jars
+cljr run ~/Desktop/dev/incanter/examples/run_prob_plots.clj
+cljr repl
+cljr swingrepl
+cljr swank
+cljr remove-classpath /Users/dliebke/Desktop/dev/incanter
+cljr remove incanter
+cljr list
+cljr clean
+cljr reload

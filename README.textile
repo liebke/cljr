@@ -1,14 +1,14 @@
 
-<img src="http://incanter.org/images/clj/clj.png" height="100" />
+<img src="http://incanter.org/images/cljr/cljr.png" height="100" />
 
 
 <b>Clj</b> is a Clojure REPL and package management system. It's designed to complement the project-oriented approach of dependency management systems like <a href="http://github.com/technomancy/leiningen">Leiningen</a> and Maven, both of which are my preferred tools for managing traditional-project dependencies. However, much of what I use Clojure for, including <a href="http://incanter.org">Incanter</a>-based data analysis, is not really project-oriented. In these cases, it is more convenient to have access to a REPL (and Swank server) backed by a global package-management system. 
 
-Another goal of the clj project is to improve the out-of-box experience for Clojure. There are many approaches to helping people get started with Clojure, from the streamlined starter-pack called <a href="http://github.com/russolsen/dejour">Dejour</a>, which only includes Clojure and Clojure-contrib, to the full-monty approach of <a href="http://github.com/relevance/labrepl">labrepl</a>, which includes several additional Clojure libraries, instructions for configuring every available Clojure IDE plugin, and web-based Clojure tutorials. 
+Another goal of the cljr project is to improve the out-of-box experience for Clojure. There are many approaches to helping people get started with Clojure, from the streamlined starter-pack called <a href="http://github.com/russolsen/dejour">Dejour</a>, which only includes Clojure and Clojure-contrib, to the full-monty approach of <a href="http://github.com/relevance/labrepl">labrepl</a>, which includes several additional Clojure libraries, instructions for configuring every available Clojure IDE plugin, and web-based Clojure tutorials. 
 
 Clj takes a third approach by providing an easy to launch REPL combined with the ability to easily search for and install Clojure packages from the Clojars repository. 
 
-Clj uses Leiningen to manage the packages in the .clj repository, and there is a project.clj file in the .clj directory that can be customized by hand if desired.
+Clj uses Leiningen to manage the packages in the .cljr repository, and there is a project.clj file in the .cljr directory that can be customized by hand if desired.
 
 
 
@@ -16,22 +16,22 @@ h2. Quick start
 
 
 *Install*
-# Download <a href="http://incanter.org/downloads/clj.jar">http://incanter.org/downloads/clj.jar</a>
-# Run @java -jar clj.jar self-install@ Note: 1) Requires java 1.6 and 2) if your browser added a .zip extension to the jar during download, just run @java -jar clj.jar.zip self-install@.
-# Copy @~/.clj/bin/clj@ or @~/.clj/bin/clj.bat@ to your path
+# Download <a href="http://incanter.org/downloads/cljr.jar">http://incanter.org/downloads/cljr.jar</a>
+# Run @java -jar cljr.jar self-install@ Note: 1) Requires java 1.6 and 2) if your browser added a .zip extension to the jar during download, just run @java -jar cljr.jar.zip self-install@.
+# Copy @~/.cljr/bin/cljr@ or @~/.cljr/bin/cljr.bat@ to your path
 
 *Try it out*
-# Run @clj list@ to see what packages are installed.
-# Run @clj search compojure@ to search for <a href="http://github.com/weavejester/compojure">Compojure</a> on <a href="http://clojars.org">Clojars</a>.
-# Run @clj describe compojure@ to get a description of the latest version of compojure.
-# Run @clj install compojure@ to install the latest version of compojure.
-# Run @clj repl@ or @clj swingrepl@ to launch a REPL configured for all the installed packages.
+# Run @cljr list@ to see what packages are installed.
+# Run @cljr search compojure@ to search for <a href="http://github.com/weavejester/compojure">Compojure</a> on <a href="http://clojars.org">Clojars</a>.
+# Run @cljr describe compojure@ to get a description of the latest version of compojure.
+# Run @cljr install compojure@ to install the latest version of compojure.
+# Run @cljr repl@ or @cljr swingrepl@ to launch a REPL configured for all the installed packages.
 
 
 
 h2. Documentation
 
-*Usage:* @clj command [arguments]@
+*Usage:* @cljr command [arguments]@
 
 *Available commands*
 *  @repl@: Starts a Clojure repl.
@@ -43,58 +43,58 @@ h2. Documentation
 *  @install package-name [package-version]@: Installs the given package from clojars.org, defaulting to the inferred latest version.
 *  @describe package-name [package-version]@: Prints the description of the given package as found in the description field of its pom file.
 *  @versions package-name@: Prints a list of the versions of the given package available on clojars.org
-*  @remove package-name@: Removes given package from the clj-repo package list, must be followed by @clj clean@ and @clj reload@ to actually remove packages from the repository.
-*  @clean@: Removes all packages from @~/.clj/lib@ directory.
-*  @reload@: Reloads all packages listed by @clj list@.
+*  @remove package-name@: Removes given package from the cljr-repo package list, must be followed by @cljr clean@ and @cljr reload@ to actually remove packages from the repository.
+*  @clean@: Removes all packages from @~/.cljr/lib@ directory.
+*  @reload@: Reloads all packages listed by @cljr list@.
 *  @classpath@: Prints classpath.
 *  @add-classpath dirs-or-jarfiles@: Adds directories or jar files to the classpath. Directories should have a trailing / to distinguish them from jar files. 
-*  @add-jars jar file(s)@: Copies jar files to the clj repository."
+*  @add-jars jar file(s)@: Copies jar files to the cljr repository."
 *  @remove-classpath dir-or-jarfile@:  Removes a directory or jar file from the classpath. Remember to include trailing / for directories.
 
 
 
-Packages are installed in @$HOME/.clj/lib@, and can be used by applications other than @clj@
+Packages are installed in @$HOME/.cljr/lib@, and can be used by applications other than @cljr@
 by including the jars in the directory on the classpath. For instance, to start a command line 
 REPL with jline, run the following command: 
 
-   @java -cp ~/.clj/lib/'*' jline.ConsoleRunner clojure.main@
+   @java -cp ~/.cljr/lib/'*' jline.ConsoleRunner clojure.main@
 
 *Installation*
-Download the <a href="http://incanter.org/downloads/clj.jar">clj.jar</a> file (or follow the instructions below to build from source):
+Download the <a href="http://incanter.org/downloads/cljr.jar">cljr.jar</a> file (or follow the instructions below to build from source):
 
-@wget http://incanter.org/downloads/clj.jar@
+@wget http://incanter.org/downloads/cljr.jar@
 
 and either double-click on the jar file to run self-install, or run the self-install command from the command line:
 
-@java -jar clj.jar self-install@
+@java -jar cljr.jar self-install@
 
 
 *Self-install will*
-* create a @$HOME/.clj@ directory 
-* initialize a local reposistory for Clojure packages in @$HOME/.clj/lib@
+* create a @$HOME/.cljr@ directory 
+* initialize a local reposistory for Clojure packages in @$HOME/.cljr/lib@
 * create the shell and Windows batch scripts, 
-** @$HOME/.clj/bin/clj@
-** @$HOME/.clj/bin/clj.bat@
+** @$HOME/.cljr/bin/cljr@
+** @$HOME/.cljr/bin/cljr.bat@
 
 
 
 *Alternative installation directories*
-You can provide alternative CLJ_HOME and USER_HOME directories by passing them as properties to the above java command. 
+You can provide alternative CLJR_HOME and USER_HOME directories by passing them as properties to the above java command. 
 
-For instance, the following command creates the @.clj@ and Maven @.m2@ directories under @C:\@ on a Windows box (something I had to do since Windows had problems with my shared home under VMWare, \\vmware-host\...).
+For instance, the following command creates the @.cljr@ and Maven @.m2@ directories under @C:\@ on a Windows box (something I had to do since Windows had problems with my shared home under VMWare, \\vmware-host\...).
 
-@java -Duser.home=C:\ -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+@java -Duser.home=C:\ -jar cljr-1.0.0-SNAPSHOT-standalone.jar self-install@
 
 
-*clj scripts*
-Once installation is complete, you should either add @$HOME/.clj/bin@ to your path, @export PATH=~/.clj/bin:$PATH@ on Unix/Mac OS X, or move the platform-appropriate clj script to a directory on your path.
+*cljr scripts*
+Once installation is complete, you should either add @$HOME/.cljr/bin@ to your path, @export PATH=~/.cljr/bin:$PATH@ on Unix/Mac OS X, or move the platform-appropriate cljr script to a directory on your path.
 
 
 h2. Build instructions
 
 @lein deps@
 @lein uberjar@
-@java -jar clj-1.0.0-SNAPSHOT-standalone.jar self-install@
+@java -jar cljr-1.0.0-SNAPSHOT-standalone.jar self-install@
 
 
 

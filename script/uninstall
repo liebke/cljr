@@ -1,5 +1,5 @@
 #!/bin/sh
 
-rm -rf ~/.clj/
+rm -rf ~/.cljr/
 
 
