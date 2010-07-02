@@ -19,6 +19,7 @@
 
 (def base-dependencies [['org.clojure/clojure "1.2.0-master-SNAPSHOT"]
 			['org.clojure/clojure-contrib "1.2.0-SNAPSHOT"]
+			['cljr "1.0.0-SNAPSHOT"]
 			['leiningen "1.0.0"]
 			['swingrepl "1.0.0-SNAPSHOT"]
 			['jline "0.9.94"]
@@ -46,7 +47,7 @@
   (let [project-file (file (str (get-cljr-home) (sep) project-clj))]
     (if (.exists project-file)
       (read-project (.getAbsolutePath project-file))
-      (println (get-cljr-home) (sep) "project.clj does not exist, cljr must be initialized."))))
+      (println (str (get-cljr-home) (sep) "project.clj does not exist, cljr must be initialized.")))))
 
 
 (defn need-to-init?
@@ -91,24 +92,32 @@
      (pr-str `(leiningen.core/defproject cljr-repo "1.0.0-SNAPSHOT"
 	       :description "cljr is a Clojure REPL and package management system."
 	       :dependencies ~dependency-vector
-	       :classpath ~classpath-vector
-	       :main cljr.main))))
+	       :classpath ~classpath-vector))))
 
 
 (defn cljr-sh-script
   ([]
-     (str "#!/bin/sh\n"
-	  "CLJR_HOME=\"" (get-cljr-home) "\" \n" 
-	  "if [ \"$1\" = \"repl\" ]; then \n"
-	  "   java -cp \"" (get-cljr-home) (sep) cljr-jar "\" "
-	  "-Duser.home=\"" (get-user-home) "\" "
-	  "-Dcljr.home=\"$CLJR_HOME\" jline.ConsoleRunner clojure.main "
-	  " -e \"(require 'cljr.main) (cljr.main/initialize-classpath)\" -r "
-	  "\n" 
-	  "else \n"
-	  "   java -cp \"" (get-cljr-home) (sep) cljr-jar "\" "
-	  "-Duser.home=\"" (get-user-home) "\" -Dcljr.home=\"$CLJR_HOME\" cljr.main $* \n"
-	  "fi \n")))
+     (str "#!/bin/sh\n\n"
+     "USER_HOME=\"" (get-user-home) "\"\n"
+     "CLJR_HOME=\"" (get-cljr-home) "\"\n" 
+     "CLASSPATH=src:test:.\n\n"
+     "if [ -n \"$CLOJURE_HOME\" ]; then\n"
+     "   for f in \"$CLOJURE_HOME/*.jar\"; do\n"
+     "      CLASSPATH= \"$CLASSPATH\":$f\n\n"
+     "   done\n\n"
+     "else\n\n"
+    "   CLOJURE_HOME=\"$CLJR_HOME\"/lib\n"
+    "fi\n\n"
+    "for f in \"$CLJR_HOME\"/lib/*.jar; do\n"
+    "   CLASSPATH=\"$CLASSPATH\":$f\n"
+    "done\n\n"
+    "if [ \"$1\" = \"repl\" ]; then\n"
+   "   java -cp \"$CLASSPATH\" -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" jline.ConsoleRunner clojure.main  -e \"(require 'cljr.main) (cljr.main/initialize-classpath)\" -r\n" 
+   "else\n\n" 
+   "    java -cp \"$CLASSPATH\" -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" cljr.App $*\n" 
+   "fi\n\n")))
+
+
 
 
 (defn cljr-bat-script

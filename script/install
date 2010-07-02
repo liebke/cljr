@@ -1,6 +1,7 @@
 #!/bin/sh
 
-lein deps
-lein uberjar
-cp cljr-1.0.0-SNAPSHOT-standalone.jar cljr.jar
-java -jar cljr.jar self-install
+mvn clean
+mvn install
+cd installer
+lein clean && lein deps && lein uberjar
+java -jar cljr-installer-1.0.0-SNAPSHOT-standalone.jar

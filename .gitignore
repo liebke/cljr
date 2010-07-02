@@ -1,6 +1,5 @@
 .*.swp
 *~
-pom.xml
 build
 target
 lib
