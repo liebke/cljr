@@ -86,6 +86,21 @@
 	   (println "\n\n"))))))
 
 
+(defn get-clojure-home-jars []
+  (let [clojure-home (System/getProperty "clojure.home")]
+    (when clojure-home
+      (filter #(.endsWith (.getName %) ".jar")
+	      (seq (.listFiles (file clojure-home)))))))
+
+(defn full-classpath []
+  (let [cljr-repo (file (get-cljr-home) "lib")
+	additional-paths (get-classpath-urls (get-classpath-vector))
+	clojure-home-jars (get-clojure-home-jars)
+	jar-files nil ;;(seq (.listFiles cljr-repo))
+	]
+    (filter identity (flatten (conj clojure-home-jars jar-files additional-paths)))))
+
+
 (defn initialize-classpath
   ([] (let [cljr-home (get-cljr-home)
 	    additional-classpaths (:classpaths (get-project))]
@@ -95,15 +110,10 @@
        (let [cljr-repo (file cljr-home "lib")]
 	 (if-not (.isDirectory cljr-repo)
 	   (println "The " (cljr-lib-dir) " repository does not exist, needs to be initialized.")
-	   (let [additional-paths (get-classpath-urls (get-classpath-vector))
-		 jar-files (seq (.listFiles cljr-repo))
-		 all-paths (if additional-paths
-			     (flatten (conj jar-files additional-paths))
-			     jar-files)
+	   (let [all-paths (full-classpath)
 		 urls (map #(-> % .toURI .toURL) all-paths)
 		 previous-classloader (.getContextClassLoader (Thread/currentThread))
-		 current-classloader (java.net.URLClassLoader/newInstance (into-array urls)
-									  previous-classloader)]
+		 current-classloader (java.net.URLClassLoader/newInstance (into-array urls))]
 	     (.setContextClassLoader (Thread/currentThread) current-classloader)
 	     (dosync (ref-set classpath-uninitialized? false))
 	     (println "Clojure classpath initialized by cljr.")))))))
@@ -136,7 +146,9 @@
 	   cljr-bin (file cljr-home "bin")
 	   current-jar  (file (first
 	   		       (filter
-	   			#(re-find (re-pattern (str "cljr-installer(\\.|-" CLJR-VERSION "-standalone\\.|-standalone\\.)(jar|zip)")) %)
+	   			#(re-find (re-pattern (str "cljr-installer(\\.|-"
+							   CLJR-VERSION
+							   "-standalone\\.|-standalone\\.)(jar|zip)")) %)
 	   			(s/split (System/getProperty "java.class.path")
 	   				 (re-pattern (path-sep))))))]
        (if (need-to-init? cljr-home)
@@ -296,5 +308,4 @@
 
 (defn -main
   ([args]
-     (doseq [arg (seq args)] (println arg))
      (apply cljr args)))
