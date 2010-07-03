@@ -26,7 +26,8 @@
 	  updated-project (assoc project :dependencies
 				 (conj dependencies
 				       [(symbol library-name)
-					library-version]))
+					library-version
+					:exclusions (excluded-dependencies)]))
 	  proj-str (project-clj-str (:dependencies updated-project)
 				    (get-classpath-vector))]
       (println "Installing version " library-version " of " library-name "...")
