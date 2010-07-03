@@ -89,16 +89,15 @@
 (defn initialize-classpath
   ([] (let [cljr-home (get-cljr-home)
 	    additional-classpaths (:classpaths (get-project))]
-	(if (.exists (file cljr-home))
-	  (initialize-classpath cljr-home additional-classpaths))))
-  ([cljr-home additional-classpaths]
+	(initialize-classpath cljr-home)))
+  ([cljr-home]
      (when @classpath-uninitialized?
        (let [cljr-repo (file cljr-home "lib")]
 	 (if-not (.isDirectory cljr-repo)
 	   (println "The " (cljr-lib-dir) " repository does not exist, needs to be initialized.")
 	   (let [additional-paths (get-classpath-urls (get-classpath-vector))
 		 jar-files (seq (.listFiles cljr-repo))
-		 all-paths (if additional-classpaths
+		 all-paths (if additional-paths
 			     (flatten (conj jar-files additional-paths))
 			     jar-files)
 		 urls (map #(-> % .toURI .toURL) all-paths)
@@ -135,20 +134,19 @@
 	   cljr-lib (file cljr-home "lib")
 	   cljr-src (file cljr-home "src")
 	   cljr-bin (file cljr-home "bin")
-	   ;; current-jar  (file (first
-	   ;; 		       (filter
-	   ;; 			#(re-find (re-pattern (str "cljr(\\.|-" CLJR-VERSION "-standalone\\.|-standalone\\.)(jar|zip)")) %)
-	   ;; 			(s/split (System/getProperty "java.class.path")
-	   ;; 				 (re-pattern (path-sep))))))]
-	   ]
+	   current-jar  (file (first
+	   		       (filter
+	   			#(re-find (re-pattern (str "cljr-installer(\\.|-" CLJR-VERSION "-standalone\\.|-standalone\\.)(jar|zip)")) %)
+	   			(s/split (System/getProperty "java.class.path")
+	   				 (re-pattern (path-sep))))))]
        (if (need-to-init? cljr-home)
 	 (do
 	   (println "--------------------------------------------------------------------------------")
 	   (println "Initializing cljr...")
 	   (println "Creating cljr home, " (get-cljr-home) "...")
 	   (doseq [d [cljr-home cljr-lib cljr-src cljr-bin]] (.mkdirs d))
-	   ;;	   (println (str "Copying " current-jar " to " cljr-home (sep) cljr-jar "..."))
-;;	   (copy current-jar (file cljr-home cljr-jar))
+	   (println (str "Copying " current-jar " to " cljr-home (sep) cljr-jar "..."))
+	   (copy current-jar (file cljr-home cljr-jar))
 	   (println (str "Creating " cljr-home (sep) project-clj " file..."))
 	   (spit (file cljr-home project-clj) (project-clj-str))
 	   (println "Creating script files...")

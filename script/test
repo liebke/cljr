@@ -1,21 +1,59 @@
 #!/bin/sh
 
 cljr help
+echo "cljr help"
+
 cljr list
+echo "cljr list"
+
 cljr search incanter
+echo "cljr search incanter"
+
 cljr describe incanter
+echo "cljr describe incanter"
+
+echo "cljr versions incanter"
 cljr versions incanter
+
+ehco "cljr install incanter"
 cljr install incanter
+
 cljr list
-cljr add-classpath /Users/dliebke/Desktop/dev/incanter
+echo "cljr list"
+
+cljr add-classpath ~/Desktop/dev/incanter
+echo "cljr add-classpath ~/Desktop/dev/incanter"
+
 cljr classpath
+echo "cljr classpath"
+
 cljr list-jars
+echo "cljr list-jars"
+
+echo "cljr run ~/Desktop/dev/incanter/examples/run_prob_plots.clj"
 cljr run ~/Desktop/dev/incanter/examples/run_prob_plots.clj
+
 cljr repl
+echo "cljr repl"
+
 cljr swingrepl
+echo "cljr swingrepl"
+
 cljr swank
-cljr remove-classpath /Users/dliebke/Desktop/dev/incanter
+echo "cljr swank"
+
+cljr remove-classpath ~/Desktop/dev/incanter
+echo "cljr remove-classpath ~/Desktop/dev/incanter"
+
+echo "cljr remove incanter"
 cljr remove incanter
+
+echo "cljr list"
 cljr list
+
+echo "cljr clean"
 cljr clean
+
+echo "cljr reload"
 cljr reload
+
