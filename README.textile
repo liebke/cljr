@@ -60,7 +60,9 @@ h2. Documentation
 ** To use a custom build of Clojure/Clojure-contrib, set the CLOJURE_HOME environment variable, place clojure*.jar and clojure-contrib*.jar files in the specified directory, and remove the current clojure/clojure-contrib jar files from the ~/.cljr/lib directory. Note: Installing new packages will likely reinstall Clojure/Clojure-contrib in the cljr lib directory.
 * *DISABLE_JLINE*: To disable JLine when using the command line repl, set this environment variable to true. @export DISABLE_JLINE="true"@
 ** Note: JLine is only used in the command line repl on Unix/Linux/Mac OS X, not on Windows.
-* *JVM_OPTS*: The default value is "-Xmx1G", other examples @export JVM_OPTS="-Xmx2G -server"@
+* *JVM_OPTS*: The default value is "-Xmx1G".
+** For example, to set the server flag, run the following sh command: @export JVM_OPTS="-Xmx2G -server"@
+** Another example, to set an HTTP proxy add the following options @export JVM_OPTS="-Dhttp.proxyHost=my-proxy-host -Dhttp.proxyPort=my-proxy-port"@
 
 To view the JVM options from a repl, use the following call:
 @(.getInputArguments (java.lang.management.ManagementFactory/getRuntimeMXBean))@
