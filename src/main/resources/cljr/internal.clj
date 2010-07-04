@@ -139,14 +139,15 @@
      "if not defined \"%CLOJURE_HOME%\" set CLOJURE_HOME=\"\""
      " \r\n\r\n"
      
-     "if (%1) == (repl) goto NOT_CLJR_ONLY\r\n"
-     "if (%1) == (swingrepl) goto NOT_CLJR_ONLY\r\n"
-     "if (%1) == (swank) goto NOT_CLJR_ONLY\r\n"
-     "if (%1) == (run) goto NOT_CLJR_ONLY\r\n"
-     "if (%1) == () goto NOT_CLJR_ONLY\r\n"
-     "if (%1) neq () goto CLJR_ONLY\r\n\r\n"
+     "if (%1) == (repl) goto SET_CLASSPATH\r\n"
+     "if (%1) == (swingrepl) goto SET_CLASSPATH\r\n"
+     "if (%1) == (swank) goto SET_CLASSPATH\r\n"
+     "if (%1) == (run) goto SET_CLASSPATH\r\n"
+     "if (%1) == () goto SET_CLASSPATH\r\n\r\n"
 
-     ":NOT_CLJR_ONLY\r\n"
+     "goto LAUNCH_CLJR_ONLY\r\n\r\n"
+     
+     ":SET_CLASSPATH\r\n"
      "  set CLASSPATH=\"\r\n"
      "     for /R \"" (get-cljr-home) "\\lib\" %%a in (*.jar) do (\r\n"
      "        set CLASSPATH=!CLASSPATH!;%%a\r\n"
@@ -163,13 +164,13 @@
      "        set CLASSPATH=!CLASSPATH!\"\r\n"
      "goto LAUNCH\r\n\r\n"
 
-     ":CLJR_ONLY\r\n"
-     "  set CLASSPATH=\"" (get-cljr-home) "\\cljr.jar\"\r\n"
-     "goto LAUNCH\r\n\r\n"
+     ":LAUNCH_CLJR_ONLY\r\n"
+     "  java -Xmx1G -Dcljr.home=" (get-cljr-home) " -Duser.home=" (get-user-home) " -jar \"" (get-cljr-home) "\\cljr.jar\" %*\r\n"
+     "goto EOF\r\n\r\n"
 
      ":LAUNCH\r\n"
      "  set CLASSPATH=%CLASSPATH%;src;test;.\r\n"
-     "  java -Xmx1G -Dcljr.home=%CLJR_HOME% -Dclojure.home=%CLOJURE_HOME% -cp \"%CLASSPATH%\" cljr.App %*\r\n"
+     "  java -Xmx1G -Dcljr.home=" (get-cljr-home) " -Duser.home=" (get-user-home) " -Dclojure.home=%CLOJURE_HOME% -cp \"%CLASSPATH%\" cljr.App %*\r\n"
      "goto EOF\r\n\r\n"
      ":EOF\r\n")))
 
