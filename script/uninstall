@@ -1,3 +1,4 @@
 #!/bin/sh
 
+rm -rf ~/.m2/repository/cljr
 rm -rf ~/.cljr/
