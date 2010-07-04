@@ -49,7 +49,9 @@ h2. Documentation
 *  @reload@: Reloads all packages listed by @cljr list@.
 *  @classpath@: Prints classpath.
 *  @add-classpath dirs-or-jarfiles@: Adds directories or jar files to the classpath. Directories should have a trailing / to distinguish them from jar files. 
-*  @add-jars jar file(s)@: Copies jar files to the cljr repository."
+*  @list-repos@: Prints a list of repositories.
+*  @add-repo repo-name repo-url@: Adds repository.
+*  @add-jars jar file(s)@: Copies jar files to the cljr repository.
 *  @remove-classpath dir-or-jarfile@:  Removes a directory or jar file from the classpath. Remember to include trailing / for directories.
 
 

@@ -28,7 +28,8 @@
 				       [(symbol library-name)
 					library-version]))
 	  proj-str (project-clj-str (:dependencies updated-project)
-				    (get-classpath-vector))]
+				    (get-classpath-vector)
+				    (get-repositories))]
       (println "Installing version " library-version " of " library-name "...")
       (spit (str (get-cljr-home) (sep) project-clj) proj-str)
       (deps (get-project)))))

@@ -26,25 +26,29 @@
 			['swank-clojure "1.2.1"]])
 
 
-(defn excluded-dependencies []
-  '[org.clojure/clojure org.clojure/clojure-contrib])
+(def get-user-home
+  (memoize
+   (fn []
+     (System/getProperty "user.home"))))
 
 
-(defn get-user-home []
-  (System/getProperty "user.home"))
+(def get-cljr-home
+  (memoize
+   (fn []
+     (let [default-cljr-home (str (get-user-home) (sep) ".cljr")]
+       (or (System/getProperty "cljr.home") default-cljr-home)))))
 
 
-(defn get-cljr-home []
-  (let [default-cljr-home (str (get-user-home) (sep) ".cljr")]
-    (or (System/getProperty "cljr.home") default-cljr-home)))
+(def cljr-lib-dir
+  (memoize
+   (fn []
+     (str (get-cljr-home) (sep) "lib" (sep)))))
 
 
-(defn cljr-lib-dir []
-  (str (get-cljr-home) (sep) "lib" (sep)))
-
-
-(defn windows-os? []
-  (.startsWith (System/getProperty "os.name") "Windows"))
+(def windows-os?
+  (memoize
+   (fn []
+     (.startsWith (System/getProperty "os.name") "Windows"))))
 
 
 (defn get-project []
@@ -61,26 +65,33 @@
 	       (= "cljr-repo" (:name (get-project)))))))
 
 
-(defn get-jars-classpath []
-  (str (cljr-lib-dir) "*"))
+(def get-jars-classpath
+  (memoize
+   (fn []
+     (str (cljr-lib-dir) "*"))))
 
 
-(defn get-classpath-vector []
-  (if (need-to-init?)
-    [;; (str (get-cljr-home) (sep) cljr-jar)
-     ;; (get-jars-classpath)
-     "./src/" "./"]
-    (vec (:classpath (get-project)))))
+(def get-classpath-vector
+  (memoize
+   (fn []
+     (if (need-to-init?)
+       ["./src/" "./"]
+       (vec (:classpath (get-project)))))))
 
 
-(defn get-dependencies []
-  (:dependencies (get-project)))
+(def get-dependencies
+  (memoize
+   (fn []
+     (:dependencies (get-project)))))
 
 
 (defn get-classpath-urls
   [classpath-vector]
   (map #(-> % file .toURI .toURL) classpath-vector))
 
+(defn get-repositories []
+  (let [repos (:repositories (get-project))]
+    (or repos {})))
 
 (defn get-classpaths
   ([] (get-classpaths (get-classpath-vector)))
@@ -91,12 +102,14 @@
 
 (defn project-clj-str
   ([] (project-clj-str base-dependencies
-		       (get-classpath-vector)))
-  ([dependency-vector classpath-vector]
+		       (get-classpath-vector)
+		       (get-repositories)))
+  ([dependency-vector classpath-vector repo-map]
      (pr-str `(leiningen.core/defproject cljr-repo "1.0.0-SNAPSHOT"
 	       :description "cljr is a Clojure REPL and package management system."
 	       :dependencies ~dependency-vector
-	       :classpath ~classpath-vector))))
+	       :classpath ~classpath-vector
+	       :repositories ~repo-map))))
 
 
 (defn cljr-sh-script

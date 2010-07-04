@@ -60,6 +60,10 @@
        "*  remove-classpath dir-or-jar: Removes a directory or jar file from the classpath." \newline
        "   Remember to include trailing / for directories." \newline
        \newline
+       "*  list-repos: Prints a list of repositories." \newline
+       \newline
+        "*  add-repo repo-name repo-url: Adds repository." \newline
+       \newline
        "*  list-jars: Prints a list of jars in the cljr repository." \newline
        \newline
        "*  help: Prints this message." \newline
@@ -127,7 +131,8 @@
 						       (first %))
 						dependencies)))
 	proj-str (project-clj-str (:dependencies updated-project)
-				  (get-classpath-vector))]
+				  (get-classpath-vector)
+				  (get-repositories))]
     (spit (str (get-cljr-home) (sep) project-clj) proj-str)
     ;; (cljr-clean)
     ;; (cljr-reload)
@@ -232,7 +237,15 @@
      (let [classpath-vector (flatten (conj (get-classpath-vector) classpath))]
        ;; generate a new project.clj
        (spit (file (str (get-cljr-home) (sep) project-clj))
-	     (project-clj-str (get-dependencies) classpath-vector)))))
+	     (project-clj-str (get-dependencies) classpath-vector (get-repositories))))))
+
+
+(defn cljr-add-repo
+  ([repo-name repo-url]
+     (let [repo-map (assoc (get-repositories) repo-name repo-url)]
+       ;; generate a new project.clj
+       (spit (file (str (get-cljr-home) (sep) project-clj))
+	     (project-clj-str (get-dependencies) (get-classpath-vector) repo-map)))))
 
 
 (defn cljr-remove-classpath
@@ -240,7 +253,7 @@
      (let [classpath-vector (into [] (filter #(not= classpath %) (get-classpath-vector)))]
        ;; generate a new project.clj
        (spit (file (str (get-cljr-home) (sep) project-clj))
-	     (project-clj-str (get-dependencies) classpath-vector)))))
+	     (project-clj-str (get-dependencies) classpath-vector (get-repositories))))))
   
 
 (defn abort [msg]
@@ -301,6 +314,7 @@
 	   :add-classpath (apply cljr-add-classpath opts)
 	   :add-jars (apply cljr-add-jars opts)
 	   :remove-classpath (apply cljr-remove-classpath opts)
+	   :add-repo (apply cljr-add-repo opts)
 	   :list-jars (cljr-list-jars)
 	   :help (println (help-text))
 	   (apply run-cljr-task (name cmd) opts)))))
