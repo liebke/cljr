@@ -143,12 +143,12 @@
      "if (%1) == (swingrepl) goto NOT_CLJR_ONLY\r\n"
      "if (%1) == (swank) goto NOT_CLJR_ONLY\r\n"
      "if (%1) == (run) goto NOT_CLJR_ONLY\r\n"
-     "if (%1) eq () goto NOT_CLJR_ONLY\r\n"
+     "if (%1) == () goto NOT_CLJR_ONLY\r\n"
      "if (%1) neq () goto CLJR_ONLY\r\n\r\n"
 
      ":NOT_CLJR_ONLY\r\n"
      "  set CLASSPATH=\"\r\n"
-     "     for /R \"" (get-cljr-home) "lib\" %%a in (*.jar) do (\r\n"
+     "     for /R \"" (get-cljr-home) "\\lib\" %%a in (*.jar) do (\r\n"
      "        set CLASSPATH=!CLASSPATH!;%%a\r\n"
      "     )\r\n"
      "     set CLASSPATH=!CLASSPATH!\"\r\n"
@@ -164,7 +164,7 @@
      "goto LAUNCH\r\n\r\n"
 
      ":CLJR_ONLY\r\n"
-     "  set CLASSPATH=\"" (get-cljr-home) "cljr.jar\"\r\n"
+     "  set CLASSPATH=\"" (get-cljr-home) "\\cljr.jar\"\r\n"
      "goto LAUNCH\r\n\r\n"
 
      ":LAUNCH\r\n"
