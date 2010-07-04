@@ -18,12 +18,12 @@
 
 
 (def base-dependencies [['org.clojure/clojure "1.2.0-master-SNAPSHOT"]
-			['org.clojure/clojure-contrib "1.2.0-SNAPSHOT" :exclusions '[org.clojure/clojure org.clojure/clojure-contrib]]
-			['cljr "1.0.0-SNAPSHOT" :exclusions '[org.clojure/clojure org.clojure/clojure-contrib]]
-			['leiningen "1.0.0" :exclusions '[org.clojure/clojure org.clojure/clojure-contrib]]
-			['swingrepl "1.0.0-SNAPSHOT" :exclusions '[org.clojure/clojure org.clojure/clojure-contrib]]
+			['org.clojure/clojure-contrib "1.2.0-SNAPSHOT"]
+			['cljr "1.0.0-SNAPSHOT"]
+			['leiningen "1.0.0"]
+			['swingrepl "1.0.0-SNAPSHOT"]
 			['jline "0.9.94"]
-			['swank-clojure "1.2.1" :exclusions '[org.clojure/clojure org.clojure/clojure-contrib]]])
+			['swank-clojure "1.2.1"]])
 
 
 (defn excluded-dependencies []
@@ -131,41 +131,45 @@
 (defn cljr-bat-script
   ([]
      (str "@echo off\r\n"
-	  "setLocal EnableDelayedExpansion\r\n"
-	  "set CLJR_HOME=\"" (get-cljr-home) "\"\r\n"
-	  "set USER_HOME=\"" (get-user-home) "\"\r\n"
-	  "if not defined %CLOJURE_HOME% set CLOJURE_HOME=%CLJR_HOME%\\lib\r\n"
+     "setLocal EnableDelayedExpansion\r\n\r\n"
+     "set CLJR_HOME=\"" (get-cljr-home) "\"\r\n"
+     "set USER_HOME=\"" (get-user-home) "\""
+     "\r\n\r\n"
+     
+     "if not defined \"%CLOJURE_HOME%\" set CLOJURE_HOME=\"\""
+     " \r\n\r\n"
+     
+     "if (%1) == (repl) goto NOT_CLJR_ONLY\r\n"
+     "if (%1) == (swingrepl) goto NOT_CLJR_ONLY\r\n"
+     "if (%1) == (swank) goto NOT_CLJR_ONLY\r\n"
+     "if (%1) == (run) goto NOT_CLJR_ONLY\r\n"
+     "if (%1) eq () goto NOT_CLJR_ONLY\r\n"
+     "if (%1) neq () goto CLJR_ONLY\r\n\r\n"
 
-	  "set CLJR_ONLY=\"true\"\r\n"
-	  "for /l %%X in (repl swingrepl swank run) do (\r\n"
-	  "   if %1% eq %%X ( set CLJR_ONLY=\"false\" )\r\n"
-	  ")\r\n"
-	  
-	  "if %CLJR_ONLY% eq \"false\" (\r\n"
-	  "   if defined %CLOJURE_HOME% (\r\n"
-	  "      set CLASSPATH=\"\r\n"
-	  "         for /R %CLOJURE_HOME% %%a in (*.jar) do (\r\n"
-	  "            set CLASSPATH=!CLASSPATH!;%%a\r\n"
-	  "         )\r\n"
-	  "         set CLASSPATH=!CLASSPATH!\"\r\n"
-	  "   )\r\n"
-	  "   set CLASSPATH=\"\r\n"
-	  "      for /R ./lib %%a in (*.jar) do (\r\n"
-	  "         set CLASSPATH=!CLASSPATH!;%%a\r\n"
-	  "      )\r\n"
-	  "      set CLASSPATH=!CLASSPATH!\"\r\n"
-	  ") else (\r\n"
-	  "   set CLASSPATH=\"%CLJR_HOME%\"\\cljr.jar\r\n"
-	  ")\r\n"
-  
-	  "set CLASSPATH=%CLASSPATH%;src;test;.\r\n"
-      
-	  "@rem jline breaks inferior-lisp.\r\n"
-	  "if /i %DISABLE_JLINE% neq \"true\" set JLINE=jline.ConsoleRunner\r\n"
-	  
-	  "if %1% eq \"repl\" (\r\n"
-	  "   java -Xmx1G -Dcljr.home=%CLJR_HOME% -Dclojure.home=%CLOJURE_HOME% -Duser.home=%USER_HOME% -cp %CLASSPATH% %JLINE% clojure.main -e \"(require 'cljr.main) (cljr.main/initialize-classpath)\" -r\r\n"
-	  ") else (\r\n"
-	  "   java -Xmx1G -Dcljr.home=%CLJR_HOME% -Dclojure.home=%CLOJURE_HOME% -Duser.home=%USER_HOME% -cp %CLASSPATH% cljr.App %* \r\n"
-	  ")\r\n")))
+     ":NOT_CLJR_ONLY\r\n"
+     "  set CLASSPATH=\"\r\n"
+     "     for /R \"" (get-cljr-home) "lib\" %%a in (*.jar) do (\r\n"
+     "        set CLASSPATH=!CLASSPATH!;%%a\r\n"
+     "     )\r\n"
+     "     set CLASSPATH=!CLASSPATH!\"\r\n"
+     "     if defined %CLOJURE_HOME% goto SET_CLOJURE_JARS\r\n"
+     "goto LAUNCH\r\n\r\n"
+
+     ":SET_CLOJURE_JARS\r\n"
+     "     set CLASSPATH=\"\r\n"
+     "        for /R %CLOJURE_HOME% %%a in (*.jar) do (\r\n"
+     "           set CLASSPATH=!CLASSPATH!;%%a\r\n"
+     "        )\r\n"
+     "        set CLASSPATH=!CLASSPATH!\"\r\n"
+     "goto LAUNCH\r\n\r\n"
+
+     ":CLJR_ONLY\r\n"
+     "  set CLASSPATH=\"" (get-cljr-home) "cljr.jar\"\r\n"
+     "goto LAUNCH\r\n\r\n"
+
+     ":LAUNCH\r\n"
+     "  set CLASSPATH=%CLASSPATH%;src;test;.\r\n"
+     "  java -Xmx1G -Dcljr.home=%CLJR_HOME% -Dclojure.home=%CLOJURE_HOME% -cp \"%CLASSPATH%\" cljr.App %*\r\n"
+     "goto EOF\r\n\r\n"
+     ":EOF\r\n")))
 

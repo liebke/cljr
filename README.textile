@@ -17,7 +17,7 @@ h2. Quick start
 
 *Install*
 # Download <a href="http://incanter.org/downloads/cljr.jar">http://incanter.org/downloads/cljr.jar</a>
-# Run @java -jar cljr.jar self-install@ Note: 1) Requires java 1.6 and 2) if your browser added a .zip extension to the jar during download, just run @java -jar cljr.jar.zip self-install@.
+# Run @java -jar cljr-installer.jar@ Note: 1) Requires java 1.6 and 2) if your browser added a .zip extension to the jar during download, just run @java -jar cljr.jar.zip@.
 # Copy @~/.cljr/bin/cljr@ or @~/.cljr/bin/cljr.bat@ to your path
 
 *Try it out*
@@ -64,12 +64,12 @@ Download the <a href="http://incanter.org/downloads/cljr.jar">cljr.jar</a> file 
 
 @wget http://incanter.org/downloads/cljr.jar@
 
-and either double-click on the jar file to run self-install, or run the self-install command from the command line:
+and either double-click on the jar file to run it from the command line:
 
-@java -jar cljr.jar self-install@
+@java -jar cljr-installer.jar@
 
 
-*Self-install will*
+*The installer will*
 * create a @$HOME/.cljr@ directory 
 * initialize a local reposistory for Clojure packages in @$HOME/.cljr/lib@
 * create the shell and Windows batch scripts, 
@@ -83,7 +83,7 @@ You can provide alternative CLJR_HOME and USER_HOME directories by passing them 
 
 For instance, the following command creates the @.cljr@ and Maven @.m2@ directories under @C:\@ on a Windows box (something I had to do since Windows had problems with my shared home under VMWare, \\vmware-host\...).
 
-@java -Duser.home=C:\ -jar cljr-1.0.0-SNAPSHOT-standalone.jar self-install@
+@java -Duser.home=C:\ -jar cljr-installer-1.0.0-SNAPSHOT-standalone.jar@
 
 
 *cljr scripts*
@@ -94,7 +94,7 @@ h2. Build instructions
 
 @lein deps@
 @lein uberjar@
-@java -jar cljr-1.0.0-SNAPSHOT-standalone.jar self-install@
+@java -jar cljr-installer-1.0.0-SNAPSHOT-standalone.jar@
 
 
 
