@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# for new version of lein
+#cp installer/cljr-installer-1.0.0-SNAPSHOT-standalone.jar ./cljr-installer.jar
+# for old version of lein
+cp installer/cljr-installer-standalone.jar ./cljr-installer.jar
+scp cljr-installer.jar liebke@incanter.org:/home/content/l/i/e/liebke/html/downloads
