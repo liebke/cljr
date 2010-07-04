@@ -53,6 +53,16 @@ h2. Documentation
 *  @remove-classpath dir-or-jarfile@:  Removes a directory or jar file from the classpath. Remember to include trailing / for directories.
 
 
+*Options*
+* *CLOJURE_HOME*: If this environment variable is set, jar files in this directory will be included first on the classpath.
+** To use a custom build of Clojure/Clojure-contrib, set the CLOJURE_HOME environment variable, place clojure*.jar and clojure-contrib*.jar files in the specified directory, and remove the current clojure/clojure-contrib jar files from the ~/.cljr/lib directory. Note: Installing new packages will likely reinstall Clojure/Clojure-contrib in the cljr lib directory.
+* *DISABLE_JLINE*: To disable JLine when using the command line repl, set this environment variable to true. @export DISABLE_JLINE="true"@
+** Note: JLine is only used in the command line repl on Unix/Linux/Mac OS X, not on Windows.
+* *JVM_OPTS*: The default value is "-Xmx1G", other examples @export JVM_OPTS="-Xmx2G -server"@
+
+To view the JVM options from a repl, use the following call:
+@(.getInputArguments (java.lang.management.ManagementFactory/getRuntimeMXBean))@
+
 
 Packages are installed in @$HOME/.cljr/lib@, and can be used by applications other than @cljr@
 by including the jars in the directory on the classpath. For instance, to start a command line 
