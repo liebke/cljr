@@ -1,8 +1,8 @@
 
-<img src="http://incanter.org/images/cljr/cljr.png" height="100" />
+<img src="http://incanter.org/images/cljr/cljrepl.png" height="150" />
 
 
-<b>Cljr</b> is a Clojure REPL and package management system. It's designed to complement the project-oriented approach of dependency management systems like <a href="http://github.com/technomancy/leiningen">Leiningen</a> and Maven, both of which are my preferred tools for managing traditional-project dependencies. However, much of what I use Clojure for, including <a href="http://incanter.org">Incanter</a>-based data analysis, is not really project-oriented. In these cases, it is more convenient to have access to a REPL (and Swank server) backed by a global package-management system. 
+<b>Cljr</b> is a Clojure REPL and package manager. It's designed to complement the project-oriented approach of dependency management systems like <a href="http://github.com/technomancy/leiningen">Leiningen</a> and Maven, both of which are my preferred tools for managing traditional-project dependencies. However, much of what I use Clojure for, including <a href="http://incanter.org">Incanter</a>-based data analysis, is not really project-oriented. In these cases, it is more convenient to have access to a REPL (and Swank server) backed by a global package-management system. 
 
 Another goal of the cljr project is to improve the out-of-box experience for Clojure. There are many approaches to helping people get started with Clojure, from the streamlined starter-pack called <a href="http://github.com/russolsen/dejour">Dejour</a>, which only includes Clojure and Clojure-contrib, to the full-monty approach of <a href="http://github.com/relevance/labrepl">labrepl</a>, which includes several additional Clojure libraries, instructions for configuring every available Clojure IDE plugin, and web-based Clojure tutorials. 
 
