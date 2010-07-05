@@ -51,8 +51,8 @@ cljr remove incanter
 echo "cljr list"
 cljr list
 
-echo "cljr clean"
-cljr clean
+#echo "cljr clean"
+#cljr clean
 
 echo "cljr reload"
 cljr reload

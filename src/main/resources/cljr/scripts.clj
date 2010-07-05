@@ -1,116 +1,5 @@
-(ns cljr.internal
-  (:use [clojure.java.io :only (file copy)]
-	[leiningen.core :only (read-project)])
-  (:require [clojure.string :as s]))
-
-
-(def CLJR-VERSION "1.0.0-SNAPSHOT")
-
-(defn sep [] (java.io.File/separator))
-
-(defn path-sep [] (java.io.File/pathSeparator))
-
-(def cljr-jar "cljr.jar")
-
-(def project-clj "project.clj")
-
-(def classpath-uninitialized? (ref true))
-
-
-(def base-dependencies [['org.clojure/clojure "1.2.0-master-SNAPSHOT"]
-			['org.clojure/clojure-contrib "1.2.0-SNAPSHOT"]
-			['cljr "1.0.0-SNAPSHOT"]
-			['leiningen "1.0.0"]
-			['swingrepl "1.0.0-SNAPSHOT"]
-			['jline "0.9.94"]
-			['swank-clojure "1.2.1"]])
-
-
-(def get-user-home
-  (memoize
-   (fn []
-     (System/getProperty "user.home"))))
-
-
-(def get-cljr-home
-  (memoize
-   (fn []
-     (let [default-cljr-home (str (get-user-home) (sep) ".cljr")]
-       (or (System/getProperty "cljr.home") default-cljr-home)))))
-
-
-(def cljr-lib-dir
-  (memoize
-   (fn []
-     (str (get-cljr-home) (sep) "lib" (sep)))))
-
-
-(def windows-os?
-  (memoize
-   (fn []
-     (.startsWith (System/getProperty "os.name") "Windows"))))
-
-
-(defn get-project []
-  (let [project-file (file (str (get-cljr-home) (sep) project-clj))]
-    (if (.exists project-file)
-      (read-project (.getAbsolutePath project-file))
-      (println (str (get-cljr-home) (sep) "project.clj does not exist, cljr must be initialized.")))))
-
-
-(defn need-to-init?
-  ([] (need-to-init? (get-cljr-home)))
-  ([cljr-home]
-     (not (and (.exists (file cljr-home project-clj))
-	       (= "cljr-repo" (:name (get-project)))))))
-
-
-(def get-jars-classpath
-  (memoize
-   (fn []
-     (str (cljr-lib-dir) "*"))))
-
-
-(def get-classpath-vector
-  (memoize
-   (fn []
-     (if (need-to-init?)
-       ["./src/" "./"]
-       (vec (:classpath (get-project)))))))
-
-
-(def get-dependencies
-  (memoize
-   (fn []
-     (:dependencies (get-project)))))
-
-
-(defn get-classpath-urls
-  [classpath-vector]
-  (map #(-> % file .toURI .toURL) classpath-vector))
-
-(defn get-repositories []
-  (let [repos (:repositories (get-project))]
-    (or repos {})))
-
-(defn get-classpaths
-  ([] (get-classpaths (get-classpath-vector)))
-  ([classpath-vector]
-     (s/join [(apply str (interpose (path-sep) classpath-vector))
-	      (str (path-sep) (get-jars-classpath))])))
-
-
-(defn project-clj-str
-  ([] (project-clj-str base-dependencies
-		       (get-classpath-vector)
-		       (get-repositories)))
-  ([dependency-vector classpath-vector repo-map]
-     (pr-str `(leiningen.core/defproject cljr-repo "1.0.0-SNAPSHOT"
-	       :description "cljr is a Clojure REPL and package management system."
-	       :dependencies ~dependency-vector
-	       :classpath ~classpath-vector
-	       :repositories ~repo-map))))
-
+(ns cljr.scripts
+  (:use [cljr core]))
 
 (defn cljr-sh-script
   ([]
@@ -147,8 +36,6 @@
 	  "else\n\n" 
 	  "    java $JVM_OPTS -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" -cp \"$CLASSPATH\" cljr.App $*\n\n" 
 	  "fi\n\n")))
-
-
 
 
 (defn cljr-bat-script
@@ -199,4 +86,3 @@
      "goto EOF\r\n\r\n"
      
      ":EOF\r\n")))
-

@@ -1,5 +1,5 @@
 (ns cljr.main
-  (:use [cljr internal clojars]
+  (:use [cljr core clojars scripts]
         [leiningen.deps :only (deps)]
 	[leiningen.clean :only (empty-directory)]
         [clojure.java.io :only (file copy)])
@@ -9,7 +9,7 @@
 
 
 
-(defn help-text []
+(defn cljr-help []
   (str \newline\newline
        "--------------------------------------------------------------------------------"
        \newline
@@ -90,24 +90,9 @@
 	   (println "\n\n"))))))
 
 
-(defn get-clojure-home-jars []
-  (let [clojure-home (System/getProperty "clojure.home")]
-    (when clojure-home
-      (filter #(.endsWith (.getName %) ".jar")
-	      (seq (.listFiles (file clojure-home)))))))
-
-(defn full-classpath []
-  (let [cljr-repo (file (get-cljr-home) "lib")
-	additional-paths (get-classpath-urls (get-classpath-vector))
-	clojure-home-jars (get-clojure-home-jars)
-	jar-files nil ;;(seq (.listFiles cljr-repo))
-	]
-    (filter identity (flatten (conj clojure-home-jars jar-files additional-paths)))))
-
-
 (defn initialize-classpath
   ([] (let [cljr-home (get-cljr-home)
-	    additional-classpaths (:classpaths (get-project))]
+	    additional-classpaths (:classpath (get-project))]
 	(initialize-classpath cljr-home)))
   ([cljr-home]
      (when @classpath-uninitialized?
@@ -123,6 +108,15 @@
 	     (println "Clojure classpath initialized by cljr.")))))))
 
 
+(defn cljr-clean []
+  (empty-directory (file (:library-path (get-project))) true))
+
+
+(defn cljr-reload []
+  (cljr-clean)
+  (deps (get-project)))
+
+
 (defn cljr-remove [library-name]
   (let [project (get-project)
 	dependencies (:dependencies project)
@@ -130,17 +124,12 @@
 			       (into [] (filter #(not= (symbol library-name)
 						       (first %))
 						dependencies)))
-	proj-str (project-clj-str (:dependencies updated-project)
-				  (get-classpath-vector)
-				  (get-repositories))]
+	proj-str (project-clj-string updated-project
+				     {:dependencies (:dependencies updated-project)})]
     (spit (str (get-cljr-home) (sep) project-clj) proj-str)
-    ;; (cljr-clean)
-    ;; (cljr-reload)
-    (println "Remember to run 'cljr clean' and 'cljr reload' to actually remove packages from the repo.")))
-
-
-(defn cljr-reload []
-  (deps (get-project)))
+    (println "--------------------------------------------------------------------------------")
+    (println (str "**" library-name " has been removed from the list of dependencies,\n"
+		  "run 'cljr reload' to actually remove packages from the repo. **\n"))))
 
 
 (defn cljr-self-install
@@ -165,7 +154,7 @@
 	   (println (str "Copying " current-jar " to " cljr-home (sep) cljr-jar "..."))
 	   (copy current-jar (file cljr-home cljr-jar))
 	   (println (str "Creating " cljr-home (sep) project-clj " file..."))
-	   (spit (file cljr-home project-clj) (project-clj-str))
+	   (spit (file cljr-home project-clj) (base-project-clj-string))
 	   (println "Creating script files...")
 	   (doto (file cljr-bin "cljr")
 	     (spit (cljr-sh-script))
@@ -179,8 +168,11 @@
 	   (println "** Installation complete. **")
 	   (println)
 	   (println "--------------------------------------------------------------------------------")
-	   (println (str "Add " cljr-home (sep) "bin to your PATH:" \newline
-			 "   export PATH=" cljr-home (sep) "bin:$PATH" \newline\newline)))
+	   (println (str ))
+	   (println (str "Cljr has been successfully installed."
+			 " Add " cljr-home (sep) "bin to your PATH:\r\n\r\n"
+			 "   $ export PATH=" cljr-home (sep) "bin:$PATH\r\n\r\n"
+			 "Run 'cljr help' for a list of available commands.\r\n")))
 	 (println (str "** " cljr-home " is already initialized. **"))))))
 
 
@@ -189,11 +181,8 @@
   (let [cljr-lib (file (cljr-lib-dir))
 	files (map file jar-files)]
     (doseq [f files]
-     (copy (file f) (file cljr-lib (.getName f))))))
-
-
-(defn cljr-clean []
-  (empty-directory (file (:library-path (get-project))) true))
+      (copy (file f) (file cljr-lib (.getName f))))
+    (println "jar files copied.")))
 
 
 (defn cljr-classpath []
@@ -237,7 +226,8 @@
      (let [classpath-vector (flatten (conj (get-classpath-vector) classpath))]
        ;; generate a new project.clj
        (spit (file (str (get-cljr-home) (sep) project-clj))
-	     (project-clj-str (get-dependencies) classpath-vector (get-repositories))))))
+	     (project-clj-string (get-project)
+				 {:classpath classpath-vector})))))
 
 
 (defn cljr-add-repo
@@ -245,7 +235,8 @@
      (let [repo-map (assoc (get-repositories) repo-name repo-url)]
        ;; generate a new project.clj
        (spit (file (str (get-cljr-home) (sep) project-clj))
-	     (project-clj-str (get-dependencies) (get-classpath-vector) repo-map)))))
+	     (project-clj-string (get-project)
+				 {:repositories repo-map})))))
 
 
 (defn cljr-remove-classpath
@@ -253,36 +244,9 @@
      (let [classpath-vector (into [] (filter #(not= classpath %) (get-classpath-vector)))]
        ;; generate a new project.clj
        (spit (file (str (get-cljr-home) (sep) project-clj))
-	     (project-clj-str (get-dependencies) classpath-vector (get-repositories))))))
+	     (project-clj-string (get-project)
+				 {:classpath classpath-vector})))))
   
-
-(defn abort [msg]
-  (println msg)
-  (System/exit 1))
-
-
-(defn task-not-found [& _]
-  (abort "That's not a task. Use \"cljr help\" to list all tasks."))
-
-
-(defn resolve-task [task]
-  (let [task-ns (symbol (str "cljr." task))
-        task (symbol task)]
-    (try
-     (when-not (find-ns task-ns)
-       (require task-ns))
-     (or (ns-resolve task-ns task)
-         #'task-not-found)
-     (catch java.io.FileNotFoundException e
-       #'task-not-found))))
-
-
-(defn run-cljr-task
-  [& [task-name & args]]
-  (let [task (resolve-task task-name)
-               value (apply task args)]
-           (when (integer? value)
-             (System/exit value))))
 
 
 (defn cljr
@@ -316,7 +280,7 @@
 	   :remove-classpath (apply cljr-remove-classpath opts)
 	   :add-repo (apply cljr-add-repo opts)
 	   :list-jars (cljr-list-jars)
-	   :help (println (help-text))
+	   :help (println (cljr-help))
 	   (apply run-cljr-task (name cmd) opts)))))
 
 

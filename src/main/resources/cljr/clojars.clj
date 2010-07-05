@@ -1,15 +1,16 @@
 (ns cljr.clojars
   (:require [clojure.string :as s])
-  (:use [cljr internal http]
+  (:use [cljr core http]
 	[leiningen.deps :only (deps)]))
 
 
-(def *clojars-all-jars-url* "http://clojars.org/repo/all-jars.clj")
-(def *clojars-all-poms-url* "http://clojars.org/repo/all-poms.txt")
-(def *clojars-repo-url* "http://clojars.org/repo/")
+(def *clojars-repo-url* "http://clojars.org/repo")
+(def *clojars-all-jars-url* (str *clojars-repo-url* "/all-jars.clj"))
+(def *clojars-all-poms-url* (str *clojars-repo-url* "/all-poms.txt"))
 
 
-(defn- get-latest-version [library-name]
+
+(defn get-latest-version [library-name]
   (let [response (http-get-text-seq *clojars-all-jars-url*)
 	lib-name (symbol library-name)]
     (second (last (filter #(= (first %) lib-name)
@@ -27,9 +28,8 @@
 				 (conj dependencies
 				       [(symbol library-name)
 					library-version]))
-	  proj-str (project-clj-str (:dependencies updated-project)
-				    (get-classpath-vector)
-				    (get-repositories))]
+	  proj-str (project-clj-string updated-project
+				       {:dependencies (:dependencies updated-project)})]
       (println "Installing version " library-version " of " library-name "...")
       (spit (str (get-cljr-home) (sep) project-clj) proj-str)
       (deps (get-project)))))
@@ -79,7 +79,7 @@
 
 (defn to-clojars-url
   ([file-location]
-     (str *clojars-repo-url* file-location)))
+     (str *clojars-repo-url* "/" file-location)))
 
 
 (defn get-latest-pom-file
