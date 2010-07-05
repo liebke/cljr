@@ -1,12 +1,18 @@
 (ns cljr.scripts
   (:use [cljr core]))
 
+(defn cygwin-safe-path-sep []
+  (if (= ";" (path-sep))
+    "\\;"
+    (path-sep)))
+
+
 (defn cljr-sh-script
   ([]
      (str "#!/bin/sh\n\n"
 	  "USER_HOME=\"" (get-user-home) "\"\n"
 	  "CLJR_HOME=\"" (get-cljr-home) "\"\n" 
-	  "CLASSPATH=src:test:.\n\n"
+	  "CLASSPATH=src" (cygwin-safe-path-sep) "test" (cygwin-safe-path-sep) ".\n\n"
 
 	  "   if [ ! -n \"$JVM_OPTS\" ]; then\n\n"
 	  "      JVM_OPTS=\"-Xmx1G\"\n"
@@ -21,14 +27,14 @@
 	  "if [ \"$1\" == \"repl\" -o \"$1\" == \"swingrepl\" -o \"$1\" == \"swank\" -o \"$1\" == \"run\" ]; then\n\n"
 	  "   if [ -n \"$CLOJURE_HOME\" ]; then\n\n"
 	  "      for f in \"$CLOJURE_HOME\"/*.jar; do\n"
-	  "         CLASSPATH=\"$CLASSPATH\":$f\n\n"
+	  "         CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "$f\n\n"
 	  "      done\n\n"
 	  "   fi\n\n"
 	  "   for f in \"$CLJR_HOME\"/lib/*.jar; do\n"
-	  "      CLASSPATH=\"$CLASSPATH\":$f\n"
+	  "      CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "$f\n"
 	  "   done\n\n"
 	  "else\n\n"
-	  "   CLASSPATH=\"$CLASSPATH\":\"$CLJR_HOME\"/cljr.jar\n\n"
+	  "   CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "\"$CLJR_HOME\"/cljr.jar\n\n"
 	  "fi\n\n"
 	  
 	  "if [ \"$1\" = \"repl\" ]; then\n"
