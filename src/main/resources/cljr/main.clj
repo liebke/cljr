@@ -49,7 +49,7 @@
        \newline
        "*  reload: Reloads all packages in the cljr repository." \newline
        \newline
-       "*  classpath: Prints classpath." \newline
+       "*  list-classpath: Prints classpath." \newline
        \newline
        "*  add-classpath dirs-or-jars: Adds directories or jar files to the classpath." \newline
        "   Directories should have a trailing / to distinguish them from jar files." \newline
@@ -63,8 +63,10 @@
        "*  list-repos: Prints a list of repositories." \newline
        \newline
         "*  add-repo repo-name repo-url: Adds repository." \newline
-       \newline
-       "*  list-jars: Prints a list of jars in the cljr repository." \newline
+	\newline
+	"*  remove-repo repo-name: Removes the given repository." \newline
+	\newline
+	"*  list-jars: Prints a list of jars in the cljr repository." \newline
        \newline
        "*  help: Prints this message." \newline
        \newline
@@ -212,8 +214,8 @@
 
 
 (defn cljr-list-repos []
-  (let [repos (or (:repositories (get-project))
-		  leiningen.pom/default-repos)]
+  (let [repos (merge leiningen.pom/default-repos
+		     (:repositories (get-project)))]
     (println "\n\nAvailable repositories:")
     (println "--------------------------------------------------------------------------------")
     (doseq [repo repos]
@@ -230,15 +232,6 @@
 				 {:classpath classpath-vector})))))
 
 
-(defn cljr-add-repo
-  ([repo-name repo-url]
-     (let [repo-map (assoc (get-repositories) repo-name repo-url)]
-       ;; generate a new project.clj
-       (spit (file (str (get-cljr-home) (sep) project-clj))
-	     (project-clj-string (get-project)
-				 {:repositories repo-map})))))
-
-
 (defn cljr-remove-classpath
   ([classpath]
      (let [classpath-vector (into [] (filter #(not= classpath %) (get-classpath-vector)))]
@@ -247,6 +240,28 @@
 	     (project-clj-string (get-project)
 				 {:classpath classpath-vector})))))
   
+(defn cljr-add-repo
+  ([repo-name repo-url]
+     (let [repo-map (assoc (get-repositories) repo-name repo-url)]
+       ;; generate a new project.clj
+       (println "--------------------------------------------------------------------------------")
+       (println "Adding " repo-name " (" repo-url ") to the list of available repositories...")
+       (spit (file (str (get-cljr-home) (sep) project-clj))
+	     (project-clj-string (get-project)
+				 {:repositories repo-map}))
+       (println repo-name " repository added.\n\n"))))
+
+
+(defn cljr-remove-repo
+  ([repo-name]
+     (let [repo-map (dissoc (get-repositories) repo-name)]
+       ;; generate a new project.clj
+       (println "--------------------------------------------------------------------------------")
+       (println "Removing " repo-name " from the list of available repositories...")
+       (spit (file (str (get-cljr-home) (sep) project-clj))
+	     (project-clj-string (get-project)
+				 {:repositories repo-map}))
+       (println repo-name " repository removed.\n\n"))))
 
 
 (defn cljr
@@ -274,11 +289,12 @@
 	   :repl (cljr-repl)
 	   :swingrepl (cljr-repl)
 	   :run (cljr-run opts)
-	   :classpath (cljr-classpath)
+	   :list-classpath (cljr-classpath)
 	   :add-classpath (apply cljr-add-classpath opts)
 	   :add-jars (apply cljr-add-jars opts)
 	   :remove-classpath (apply cljr-remove-classpath opts)
 	   :add-repo (apply cljr-add-repo opts)
+	   :remove-repo (apply cljr-remove-repo opts)
 	   :list-jars (cljr-list-jars)
 	   :help (println (cljr-help))
 	   (apply run-cljr-task (name cmd) opts)))))

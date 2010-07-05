@@ -48,10 +48,11 @@ h2. Documentation
 *  @remove package-name@: Removes given package from the cljr-repo package list, must be followed by @cljr clean@ and @cljr reload@ to actually remove packages from the repository.
 *  @clean@: Removes all packages from @~/.cljr/lib@ directory.
 *  @reload@: Reloads all packages listed by @cljr list@.
-*  @classpath@: Prints classpath.
+*  @list-classpath@: Prints classpath.
 *  @add-classpath dirs-or-jarfiles@: Adds directories or jar files to the classpath. Directories should have a trailing / to distinguish them from jar files. 
 *  @list-repos@: Prints a list of repositories.
 *  @add-repo repo-name repo-url@: Adds repository.
+*  @remove-repo repo-name@: Removes the given repository.
 *  @add-jars jar file(s)@: Copies jar files to the cljr repository.
 *  @remove-classpath dir-or-jarfile@:  Removes a directory or jar file from the classpath. Remember to include trailing / for directories.
 
