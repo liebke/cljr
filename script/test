@@ -33,8 +33,8 @@ cljr list
 echo "cljr add-classpath ~/Desktop/dev/incanter"
 cljr add-classpath ~/Desktop/dev/incanter
 
-echo "cljr classpath"
-cljr classpath
+echo "cljr list-classpath"
+cljr list-classpath
 
 echo "cljr list-jars"
 cljr list-jars
