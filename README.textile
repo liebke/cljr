@@ -16,11 +16,11 @@ h2. Quick start
 
 
 *Install*
-# Download <a href="http://incanter.org/downloads/cljr-installer.jar">http://incanter.org/downloads/cljr-installer.jar</a>
+# Download <a href="http://incanter.org/downloads/cljr-installer.jar">cljr-installer.jar</a>
 # Run @java -jar cljr-installer.jar@ 
-** Note 1: If your browser added a .zip extension to the jar during download, just run @java -jar cljr-installer.jar.zip@.
+** Note 1: If your browser added a .zip extension to the jar during download, just run: @java -jar cljr-installer.jar.zip@.
 ** Note 2: Requires java 1.6
-# Add @~/.cljr/bin/cljr@ or @~/.cljr/bin/cljr.bat@ to your path
+# Add @~/.cljr/bin/@ to your path (or copy the platform appropriate @cljr@ script to your path).
 
 *Try it out*
 # Run @cljr list@ to see what packages are installed.

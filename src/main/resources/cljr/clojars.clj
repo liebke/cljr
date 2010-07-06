@@ -100,6 +100,31 @@
       (extract-description-text)))
 
 
+(defn get-library-dependencies
+  [library-name version]
+  (let [pom-xml (clojure.xml/parse
+		 (java.io.ByteArrayInputStream.
+		  (.getBytes (apply str (get-latest-pom-file library-name version)))))
+	deps-xml (filter #(= (:tag %) :dependencies) (:content pom-xml))
+	deps-seq (partition 3 (for [x (xml-seq deps-xml)
+				    :when (or (= (:tag x) :artifactId)
+					      (= (:tag x) :groupId)
+					      (= (:tag x) :version))] 
+				(hash-map (:tag x) (first (:content x)))))]
+    (into #{} (for [v deps-seq] (apply merge v)))
+    (map :content (:content (first deps-xml)))))
+
+
+(defn print-library-dependencies
+  [library-name version]
+  (println (str "\n\nDependencies for: " library-name "  " version))
+  (println "--------------------------------------------------------------------------------")
+  (doseq [d (get-library-dependencies library-name version)]
+    (let [dep (apply merge (map #(hash-map (:tag %) (first (:content %))) d))]
+      (println (str (:groupId dep) "/" (:artifactId dep) "  " (:version dep)))))
+  (println "\n\n"))
+
+
 (defn clojars-describe
   ([library-name]
      (clojars-describe library-name (get-latest-version library-name)))
@@ -109,6 +134,7 @@
        (println (str "\n\nDescription for library: " library-name "  " version))
        (println "--------------------------------------------------------------------------------")
        (println desc-text)
-       (println "\n\n"))))
+       (println "")
+       (print-library-dependencies library-name version))))
 
 
