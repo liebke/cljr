@@ -111,11 +111,14 @@
 
 
 (defn cljr-clean []
+  (println "--------------------------------------------------------------------------------")
+  (println "Removing all installed libraries, run 'cljr reload' to re-install...")
   (empty-directory (file (:library-path (get-project))) true))
 
 
 (defn cljr-reload []
-  (cljr-clean)
+  (println "--------------------------------------------------------------------------------")
+  (println "Reloading libraries...")
   (deps (get-project)))
 
 
@@ -131,7 +134,7 @@
     (spit (str (get-cljr-home) (sep) project-clj) proj-str)
     (println "--------------------------------------------------------------------------------")
     (println (str "**" library-name " has been removed from the list of dependencies,\n"
-		  "run 'cljr reload' to actually remove packages from the repo. **\n"))))
+		  "run 'cljr clean' and 'cljr reload' to actually remove packages from the repo. **\n"))))
 
 
 (defn cljr-self-install
