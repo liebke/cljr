@@ -135,6 +135,7 @@
        (println "--------------------------------------------------------------------------------")
        (println desc-text)
        (println "")
-       (print-library-dependencies library-name version))))
+       (when desc-text
+	 (print-library-dependencies library-name version)))))
 
 
