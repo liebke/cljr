@@ -150,35 +150,37 @@
 							   "-standalone\\.|-standalone\\.)(jar|zip)")) %)
 	   			(s/split (System/getProperty "java.class.path")
 	   				 (re-pattern (path-sep))))))]
-       (if (need-to-init? cljr-home)
+       (println "--------------------------------------------------------------------------------")
+       (when-not (need-to-init? cljr-home)
 	 (do
-	   (println "--------------------------------------------------------------------------------")
-	   (println "Initializing cljr...")
-	   (println "Creating cljr home, " (get-cljr-home) "...")
-	   (doseq [d [cljr-home cljr-lib cljr-src cljr-bin]] (.mkdirs d))
-	   (println (str "Copying " current-jar " to " cljr-home (sep) cljr-jar "..."))
-	   (copy current-jar (file cljr-home cljr-jar))
-	   (println (str "Creating " cljr-home (sep) project-clj " file..."))
-	   (spit (file cljr-home project-clj) (base-project-clj-string))
-	   (println "Creating script files...")
-	   (doto (file cljr-bin "cljr")
-	     (spit (cljr-sh-script))
-	     (.setExecutable true))
-	   (doto (file cljr-bin "cljr.bat")
-	     (spit (cljr-bat-script))
-	     (.setExecutable true))
-	   (println "Loading core dependencies...")
-	   (cljr-reload)
-	   (println)
-	   (println "** Installation complete. **")
-	   (println)
-	   (println "--------------------------------------------------------------------------------")
-	   (println (str ))
-	   (println (str "Cljr has been successfully installed."
-			 " Add " cljr-home (sep) "bin to your PATH:\r\n\r\n"
-			 "   $ export PATH=" cljr-home (sep) "bin:$PATH\r\n\r\n"
-			 "Run 'cljr help' for a list of available commands.\r\n")))
-	 (println (str "** " cljr-home " is already initialized. **"))))))
+	   (println (str "** Reinstalling cljr, cleaning existing " cljr-home " directory... **"))
+	   (empty-directory cljr-home true)))
+       (do
+	 (println "Initializing cljr...")
+	 (println "Creating cljr home, " (get-cljr-home) "...")
+	 (doseq [d [cljr-home cljr-lib cljr-src cljr-bin]] (.mkdirs d))
+	 (println (str "Copying " current-jar " to " cljr-home (sep) cljr-jar "..."))
+	 (copy current-jar (file cljr-home cljr-jar))
+	 (println (str "Creating " cljr-home (sep) project-clj " file..."))
+	 (spit (file cljr-home project-clj) (base-project-clj-string))
+	 (println "Creating script files...")
+	 (doto (file cljr-bin "cljr")
+	   (spit (cljr-sh-script))
+	   (.setExecutable true))
+	 (doto (file cljr-bin "cljr.bat")
+	   (spit (cljr-bat-script))
+	   (.setExecutable true))
+	 (println "Loading core dependencies...")
+	 (cljr-reload)
+	 (println)
+	 (println "** Installation complete. **")
+	 (println)
+	 (println "--------------------------------------------------------------------------------")
+	 (println (str ))
+	 (println (str "Cljr has been successfully installed."
+		       " Add " cljr-home (sep) "bin to your PATH:\r\n\r\n"
+		       "   $ export PATH=" cljr-home (sep) "bin:$PATH\r\n\r\n"
+		       "Run 'cljr help' for a list of available commands.\r\n"))))))
 
 
 (defn cljr-add-jars [& jar-files]

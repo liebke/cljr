@@ -5,4 +5,4 @@
 
 (defn -main
   ([& args]
-     (cljr.main/-main args)))
+     (cljr.main/-main [:self-install])))
