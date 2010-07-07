@@ -273,9 +273,7 @@
   "Provides access to the cljr package management system. It uses the same arguments
   as the command line version, using keywords for commands and strings for arguments."
   ([]
-     (if (need-to-init?)
-       (cljr :self-install)
-       (cljr :repl)))
+       (cljr :repl))
   ([& args]
      (initialize-classpath)
      (let [cmd (keyword (first args))

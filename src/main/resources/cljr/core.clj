@@ -53,8 +53,7 @@
 (defn need-to-init?
   ([] (need-to-init? (get-cljr-home)))
   ([cljr-home]
-     (not (and (.exists (file cljr-home project-clj))
-	       (= "cljr-repo" (:name (get-project)))))))
+     (not (.exists (file cljr-home project-clj)))))
 
 
 (defn get-jars-classpath []
