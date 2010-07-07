@@ -18,13 +18,13 @@
 	  "      JVM_OPTS=\"-Xmx1G\"\n"
 	  "   fi\n\n"
 
-	  "   if [ \"$DISABLE_JLINE\" == \"true\" ]; then\n\n"
+	  "   if [ \"$DISABLE_JLINE\" = \"true\" ]; then\n\n"
 	  "      JLINE=\"\"\n"
 	  "   else\n"
 	  "      JLINE=\"jline.ConsoleRunner\"\n"
 	  "   fi\n\n"
 
-	  "if [ \"$1\" == \"repl\" -o \"$1\" == \"swingrepl\" -o \"$1\" == \"swank\" -o \"$1\" == \"run\" ]; then\n\n"
+	  "if [ \"$1\" = \"repl\" -o \"$1\" = \"swingrepl\" -o \"$1\" = \"swank\" -o \"$1\" = \"run\" ]; then\n\n"
 	  "   if [ -n \"$CLOJURE_HOME\" ]; then\n\n"
 	  "      for f in \"$CLOJURE_HOME\"/*.jar; do\n"
 	  "         CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "$f\n\n"
