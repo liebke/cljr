@@ -20,7 +20,11 @@
 
 (defn clojars-install
   ([library-name]
-    (clojars-install library-name (get-latest-version library-name)))
+     (let [version (get-latest-version library-name)]
+       (if version
+	 (clojars-install library-name version)
+	 (println "Cannot find version of" library-name "on Clojars.org.\r\n"
+		  "If the library is in another repository, provide a version argument."))))
   ([library-name library-version]
     (let [project (get-project)
 	  dependencies (:dependencies project)

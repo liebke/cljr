@@ -30,6 +30,9 @@ cljr install incanter
 echo "cljr list"
 cljr list
 
+echo "cljr install latest-nonexistent-library"
+cljr install latest-nonexistent-library
+
 echo "cljr add-classpath ~/Desktop/dev/incanter"
 cljr add-classpath ~/Desktop/dev/incanter
 
