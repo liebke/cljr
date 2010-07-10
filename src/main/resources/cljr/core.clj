@@ -143,12 +143,17 @@
 	      (seq (.listFiles (file clojure-home)))))))
 
 
+(defn include-cljr-repo-jars? []
+  (not= "false" (System/getProperty "include.cljr.repo.jars")))
+
+
 (defn full-classpath []
   (let [cljr-repo (file (get-cljr-home) "lib")
 	additional-paths (get-classpath-urls (get-classpath-vector))
-	clojure-home-jars (get-clojure-home-jars)
-	jar-files nil ;;(seq (.listFiles cljr-repo))
-	]
+	clojure-home-jars (when (include-cljr-repo-jars?)
+			    (get-clojure-home-jars))
+	jar-files (when (include-cljr-repo-jars?)
+		    (seq (.listFiles cljr-repo)))]
     (filter identity (flatten (conj clojure-home-jars jar-files additional-paths)))))
 
 

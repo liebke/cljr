@@ -1,4 +1,4 @@
-(ns cljr.installer
+(ns cljr.repl
   (:require cljr.main)
   (:gen-class))
 

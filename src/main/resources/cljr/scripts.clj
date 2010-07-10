@@ -14,33 +14,34 @@
 	  "CLJR_HOME=\"" (get-cljr-home) "\"\n" 
 	  "CLASSPATH=src" (cygwin-safe-path-sep) "test" (cygwin-safe-path-sep) ".\n\n"
 
-	  "   if [ ! -n \"$JVM_OPTS\" ]; then\n\n"
+	  "   if [ ! -n \"$JVM_OPTS\" ]; then\n"
 	  "      JVM_OPTS=\"-Xmx1G\"\n"
 	  "   fi\n\n"
 
-	  "   if [ \"$DISABLE_JLINE\" = \"true\" ]; then\n\n"
+	  "   if [ \"$DISABLE_JLINE\" = \"true\" ]; then\n"
 	  "      JLINE=\"\"\n"
 	  "   else\n"
 	  "      JLINE=\"jline.ConsoleRunner\"\n"
 	  "   fi\n\n"
 
-	  "if [ \"$1\" = \"repl\" -o \"$1\" = \"swingrepl\" -o \"$1\" = \"swank\" -o \"$1\" = \"run\" ]; then\n\n"
-	  "   if [ -n \"$CLOJURE_HOME\" ]; then\n\n"
+	  "if [ \"$1\" = \"repl\" -o \"$1\" = \"swingrepl\" -o \"$1\" = \"swank\" -o \"$1\" = \"run\" ]; then\n"
+	  "   if [ -n \"$CLOJURE_HOME\" ]; then\n"
 	  "      for f in \"$CLOJURE_HOME\"/*.jar; do\n"
-	  "         CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "$f\n\n"
-	  "      done\n\n"
-	  "   fi\n\n"
+	  "         CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "$f\n"
+	  "      done\n"
+	  "   fi\n"
 	  "   for f in \"$CLJR_HOME\"/lib/*.jar; do\n"
 	  "      CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "$f\n"
 	  "   done\n\n"
-	  "else\n\n"
-	  "   CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "\"$CLJR_HOME\"/cljr.jar\n\n"
-	  "fi\n\n"
 	  
-	  "if [ \"$1\" = \"repl\" ]; then\n"
-	  "   java $JVM_OPTS -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" -cp \"$CLASSPATH\" $JLINE clojure.main -e \"(require 'cljr.main) (cljr.main/initialize-classpath)\" -r\n\n" 
-	  "else\n\n" 
-	  "    java $JVM_OPTS -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" -cp \"$CLASSPATH\" cljr.App $*\n\n" 
+	  "   if [ \"$1\" = \"repl\" ]; then\n"
+	  "      java $JVM_OPTS -Dinclude.cljr.repo.jars=false -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" -cp \"$CLASSPATH\" $JLINE clojure.main -e \"(require 'cljr.main) (cljr.main/initialize-classpath)\" -r\n"
+	  "   else\n"
+	  "      java $JVM_OPTS -Dinclude.cljr.repo.jars=false -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" -cp \"$CLASSPATH\" cljr.App $*\n" 
+	  "   fi\n"
+	  "else\n"
+	  "   CLASSPATH=\"$CLASSPATH\"" (cygwin-safe-path-sep) "\"$CLJR_HOME\"/cljr.jar\n"
+	  "   java $JVM_OPTS -Duser.home=\"$USER_HOME\" -Dclojure.home=\"$CLOJURE_HOME\" -Dcljr.home=\"$CLJR_HOME\" -cp \"$CLASSPATH\" cljr.App $*\n" 
 	  "fi\n\n")))
 
 
@@ -88,7 +89,7 @@
      "goto EOF\r\n\r\n"
 
      ":LAUNCH\r\n"
-     "  java %JVM_OPTS% -Dcljr.home=" (get-cljr-home) " -Duser.home=" (get-user-home) " -Dclojure.home=%CLOJURE_HOME% -cp \"%CLASSPATH%\" cljr.App %*\r\n"
+     "  java %JVM_OPTS% -Dinclude.cljr.repo.jars=false -Dcljr.home=" (get-cljr-home) " -Duser.home=" (get-user-home) " -Dclojure.home=%CLOJURE_HOME% -cp \"%CLASSPATH%\" cljr.App %*\r\n"
      "goto EOF\r\n\r\n"
      
      ":EOF\r\n")))

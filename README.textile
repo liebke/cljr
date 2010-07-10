@@ -30,6 +30,10 @@ h2. Quick start
 # Run @cljr repl@ or @cljr swingrepl@ to launch a REPL configured for all the installed packages.
 
 
+You can also use the executable jar, cljr.jar, installed in ~/.cljr to run commands:
+* @java -jar ~/.cljr/cljr.jar list@
+* @java -jar ~/.cljr/cljr.jar repl@
+
 
 h2. Documentation
 
@@ -98,9 +102,9 @@ and either double-click on the jar file to run it from the command line:
 *Alternative installation directories*
 You can provide alternative CLJR_HOME and USER_HOME directories by passing them as properties to the above java command. 
 
-For instance, the following command creates the @.cljr@ and Maven @.m2@ directories under @C:\@ on a Windows box (something I had to do since Windows had problems with my shared home under VMWare, \\vmware-host\...).
+For instance, the following command creates the @.cljr@ and Maven @.m2@ directories under @C:@ on a Windows box (something I had to do since Windows had problems with my shared home under VMWare, \\vmware-host\...).
 
-@java -Duser.home=C:\ -jar cljr-installer.jar@
+@java -Duser.home=C: -jar cljr-installer.jar@
 
 
 *cljr scripts*
