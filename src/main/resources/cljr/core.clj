@@ -17,8 +17,8 @@
 (def classpath-uninitialized? (ref true))
 
 
-(def base-dependencies [['org.clojure/clojure "1.2.0-master-SNAPSHOT"]
-			['org.clojure/clojure-contrib "1.2.0-SNAPSHOT"]
+(def base-dependencies [['org.clojure/clojure "1.2.0-beta1"]
+			['org.clojure/clojure-contrib "1.2.0-beta1"]
 			['cljr  CLJR-VERSION]
 			['leiningen "1.1.0"]
 			['swingrepl "1.0.0-SNAPSHOT"]
