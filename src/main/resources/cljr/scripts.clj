@@ -12,7 +12,7 @@
      (str "#!/bin/sh\n\n"
 	  "USER_HOME=\"" (get-user-home) "\"\n"
 	  "CLJR_HOME=\"" (get-cljr-home) "\"\n" 
-	  "CLASSPATH=src" (cygwin-safe-path-sep) "test" (cygwin-safe-path-sep) ".\n\n"
+	  "CLASSPATH=src" (cygwin-safe-path-sep) "test" (cygwin-safe-path-sep) "." (cygwin-safe-path-sep) (get-cljr-home) "\n\n"
 
 	  "   if [ ! -n \"$JVM_OPTS\" ]; then\n"
 	  "      JVM_OPTS=\"-Xmx1G\"\n"
@@ -81,7 +81,7 @@
      "        set CLASSPATH=!CLASSPATH!;%%a\r\n"
      "     )\r\n"
      "     set CLASSPATH=!CLASSPATH!\"\r\n"
-     "  set CLASSPATH=%CLASSPATH%;src;test;.\r\n"
+     "  set CLASSPATH=%CLASSPATH%;src;test;.;" (get-cljr-home) "\r\n"
      "goto LAUNCH\r\n\r\n"
 
      ":LAUNCH_CLJR_ONLY\r\n"

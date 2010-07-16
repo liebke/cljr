@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "Creating ~/.cljr/user.clj ..."
+echo "(println \"Hello from ~/.cljr/user.clj\")" > ~/.cljr/user.clj
+
 echo "cljr help"
 cljr help
 
@@ -75,3 +78,5 @@ cljr reload
 echo "cljr list"
 cljr list
 
+echo "removing ~/.cljr/user.clj ..."
+rm ~/.cljr/user.clj
