@@ -106,7 +106,8 @@
 		 previous-classloader (.getContextClassLoader (Thread/currentThread))
 		 current-classloader (java.net.URLClassLoader/newInstance (into-array urls))]
 	     (.setContextClassLoader (Thread/currentThread) current-classloader)
-	     (dosync (ref-set classpath-uninitialized? false))))))))
+	     (dosync (ref-set classpath-uninitialized? false))
+	     nil))))))
 
 
 (defn cljr-clean []
