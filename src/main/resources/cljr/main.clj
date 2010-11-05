@@ -1,12 +1,9 @@
 (ns cljr.main
   (:use [cljr core clojars scripts]
         [leiningen.deps :only (deps)]
-	[leiningen.clean :only (empty-directory)]
-        [clojure.java.io :only (file copy)])
+        [clojure.java.io :only (file copy delete-file)])
   (:require org.dipert.swingrepl.main
 	    [clojure.string :as s]))
-
-
 
 
 (defn cljr-help []
@@ -78,7 +75,6 @@
        "   java -cp $CLJR_HOME/lib/'*' jline.ConsoleRunner clojure.main" \newline
        \newline))
 
-
 (defn cljr-list-jars
   ([] (cljr-list-jars (get-cljr-home)))
   ([cljr-home]
@@ -86,11 +82,10 @@
        (if-not (.isDirectory cljr-repo)
 	 (println "The " (cljr-lib-dir) " repository does not exist, needs to be initialized.")
 	 (let [files (seq (.listFiles cljr-repo))]
-	   (println "\n\nList of jar files in the cljr repository:\n")
+	   (println "\n\nList of jar files in theq0 cljr repository:\n")
 	   (println "--------------------------------------------------------------------------------")
 	   (doseq [f files] (println (.getName f)))
 	   (println "\n\n"))))))
-
 
 (defn initialize-classpath
   ([] (let [cljr-home (get-cljr-home)
@@ -109,18 +104,29 @@
 	     (dosync (ref-set classpath-uninitialized? false))
 	     nil))))))
 
+(defn delete-file-recursively
+  "Delete file f. If it's a directory, recursively delete all its contents.
+Raise an exception if any deletion fails unless silently is true."
+  [f & [silently]]
+  (let [f (file f)]
+    (if (.isDirectory f)
+      (doseq [child (.listFiles f)]
+        (delete-file-recursively child silently)))
+    (delete-file f silently)))
+
+(defn- empty-directory [dir]
+  (doseq [child (.listFiles dir)]
+    (delete-file-recursively child true)))
 
 (defn cljr-clean []
   (println "--------------------------------------------------------------------------------")
   (println "Removing all installed libraries, run 'cljr reload' to re-install...")
-  (empty-directory (file (:library-path (get-project))) true))
-
+  (empty-directory (file (:library-path (get-project)))))
 
 (defn cljr-reload []
   (println "--------------------------------------------------------------------------------")
   (println "Reloading libraries...")
   (deps (get-project)))
-
 
 (defn cljr-remove [library-name]
   (let [project (get-project)
@@ -135,7 +141,6 @@
     (println "--------------------------------------------------------------------------------")
     (println (str "**" library-name " has been removed from the list of dependencies,\n"
 		  "run 'cljr clean' and 'cljr reload' to actually remove packages from the repo. **\n"))))
-
 
 (defn cljr-self-install
   ([]
@@ -154,7 +159,7 @@
        (when-not (need-to-init? cljr-home)
 	 (do
 	   (println (str "** Reinstalling cljr, cleaning existing " cljr-home " directory... **"))
-	   (empty-directory cljr-home true)))
+	   (empty-directory cljr-home)))
        (do
 	 (println "Initializing cljr...")
 	 (println "Creating cljr home, " (get-cljr-home) "...")
@@ -219,7 +224,7 @@
 
 
 (defn cljr-list-repos []
-  (let [repos (merge leiningen.pom/default-repos
+  (let [repos (merge leiningen.core/default-repos
 		     (:repositories (get-project)))]
     (println "\n\nAvailable repositories:")
     (println "--------------------------------------------------------------------------------")

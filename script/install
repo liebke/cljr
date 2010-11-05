@@ -7,4 +7,4 @@ lein clean && lein deps && lein uberjar
 # for new version of lein
 #java -jar cljr-installer-1.0.0-SNAPSHOT-standalone.jar
 # for old version of lein
-java -jar cljr-installer-standalone.jar
+java -jar cljr-installer-1.3.0-standalone.jar
