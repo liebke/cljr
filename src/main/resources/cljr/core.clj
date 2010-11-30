@@ -91,8 +91,6 @@
   [deps classpath repos]
   {:pre [(every? vector? [deps classpath])]
    :post [(string? %)]}
-  (println (class repos))
-  (clojure.pprint/pprint repos)
   (with-out-str
     (clojure.pprint/pprint
      (concat
