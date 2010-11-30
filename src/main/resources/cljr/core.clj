@@ -18,7 +18,7 @@
 (def classpath-uninitialized? (ref true))
 
 
-(def base-dependencies [['org.clojure/clojure "1.3.0-alpha2"]
+(def base-dependencies [['org.clojure/clojure "1.3.0-alpha3"]
 			['cljr  CLJR-VERSION]
 			['leiningen "1.3.1"]
 			['swingrepl "1.3.0"]
