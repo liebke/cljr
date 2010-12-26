@@ -4,7 +4,7 @@
   (:use [clojure.java.io :only (reader)])
   (:require [clojure.string :as s]))
 
-(def *connect-timeout* 0)
+(def connect-timeout 0)
 
 (defn- body-seq
   "Returns a lazy-seq of lines from either the input stream
@@ -23,7 +23,7 @@
 	   ^HttpURLConnection connection (cast HttpURLConnection (.openConnection u))
 	   method "GET"]
        (.setRequestMethod connection method)
-       (.setConnectTimeout connection *connect-timeout*)
+       (.setConnectTimeout connection connect-timeout)
        connection)))
 
 (defn http-get-text-seq
