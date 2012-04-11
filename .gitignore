@@ -7,3 +7,4 @@ classes
 *.jar
 *.log
 .#*
+.lein-deps-sum
