@@ -3,7 +3,8 @@
         [leiningen.deps :only (deps)]
         [clojure.java.io :only (file copy delete-file)])
   (:require org.dipert.swingrepl.main
-	    [clojure.string :as s]))
+            reply.main
+	          [clojure.string :as s]))
 
 
 (defn cljr-help []
@@ -209,6 +210,9 @@ Raise an exception if any deletion fails unless silently is true."
   (org.dipert.swingrepl.main/make-repl-jframe 
    {:on-close javax.swing.JFrame/EXIT_ON_CLOSE}))
 
+(defn cljr-reply []
+   (reply.main/launch-standalone {}))
+
 
 (defn cljr-run [filename]
   (apply clojure.main/main filename))
@@ -297,6 +301,7 @@ Raise an exception if any deletion fails unless silently is true."
 	   :versions (apply clojars-versions opts)
 	   :describe (apply clojars-describe opts)
 	   :repl (cljr-repl)
+	   :reply (cljr-reply)
 	   :swingrepl (cljr-repl)
 	   :run (cljr-run opts)
 	   :list-classpath (cljr-classpath)

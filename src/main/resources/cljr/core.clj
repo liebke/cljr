@@ -20,10 +20,10 @@
 
 (def base-dependencies [['org.clojure/clojure "1.3.0"]
 			['cljr  CLJR-VERSION]
+			['org.clojars.trptcolin/jline "2.7-alpha1"]
 			['leiningen "1.3.1"]
 			['swingrepl "1.3.0"]
-			['jline "0.9.94"]
-			['swank-clojure "1.5.0-SNAPSHOT"]])
+			['swank-clojure "1.3.0-SNAPSHOT"]])
 
 
 (defn get-user-home []
