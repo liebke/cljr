@@ -1,4 +1,3 @@
-
 <img src="http://incanter.org/images/cljr/cljrepl.png" height="150" />
 
 
@@ -92,7 +91,7 @@ and either double-click on the jar file to run it from the command line:
 
 *The installer will*
 * create a @$HOME/.cljr@ directory 
-* initialize a local reposistory for Clojure packages in @$HOME/.cljr/lib@
+* initialize a local repository for Clojure packages in @$HOME/.cljr/lib@
 * create the shell and Windows batch scripts, 
 ** @$HOME/.cljr/bin/cljr@
 ** @$HOME/.cljr/bin/cljr.bat@
