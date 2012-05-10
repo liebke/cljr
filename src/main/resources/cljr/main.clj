@@ -206,7 +206,7 @@ Raise an exception if any deletion fails unless silently is true."
   (println (str "  " (get-jars-classpath) \newline \newline)))
 
 
-(defn cljr-repl []
+(defn cljr-swingrepl []
   (org.dipert.swingrepl.main/make-repl-jframe 
    {:on-close javax.swing.JFrame/EXIT_ON_CLOSE}))
 
@@ -284,7 +284,7 @@ Raise an exception if any deletion fails unless silently is true."
   ([]
      (if (need-to-init?)
        (cljr :self-install)
-       (cljr :repl)))
+       (cljr :reply)))
   ([& args]
      (initialize-classpath)
      (let [cmd (keyword (first args))
@@ -301,7 +301,7 @@ Raise an exception if any deletion fails unless silently is true."
 	   :versions (apply clojars-versions opts)
 	   :describe (apply clojars-describe opts)
 	   :repl (cljr-reply)
-	   :swingrepl (cljr-repl)
+	   :swingrepl (cljr-swingrepl)
 	   :run (cljr-run opts)
 	   :list-classpath (cljr-classpath)
 	   :add-classpath (apply cljr-add-classpath opts)
