@@ -16,11 +16,9 @@ h2. Quick start
 
 
 *Install*
-# Download <a href="http://incanter.org/downloads/cljr-installer.jar">cljr-installer.jar</a>
-# Run @java -jar cljr-installer.jar@ 
-** Note 1: If your browser added a .zip extension to the jar during download, just run: @java -jar cljr-installer.jar.zip@.
-** Note 2: Requires java 1.6
-# Add @~/.cljr/bin/@ to your path (or copy the platform appropriate @cljr@ script to your path).
+# @git clone git@github.com:zcaudate/cljr.git
+# @cd cljr
+# @script/install
 
 *Try it out*
 # Run @cljr list@ to see what packages are installed.
@@ -28,7 +26,6 @@ h2. Quick start
 # Run @cljr describe compojure@ to get a description of the latest version of compojure.
 # Run @cljr install compojure@ to install the latest version of compojure.
 # Run @cljr repl@ or @cljr swingrepl@ to launch a REPL configured for all the installed packages.
-
 
 You can also use the executable jar, cljr.jar, installed in ~/.cljr to run commands:
 * @java -jar ~/.cljr/cljr.jar list@
