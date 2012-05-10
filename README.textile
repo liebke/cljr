@@ -16,9 +16,10 @@ h2. Quick start
 
 
 *Install*
-# @git clone git://github.com/zcaudate/cljr.git
-# @cd cljr
-# @script/install
+# Clone Repository @git clone git://github.com/zcaudate/cljr.git
+# Go into directory @cd cljr
+# Run install script @script/install
+# Run program @cljr
 
 *Try it out*
 # Run @cljr list@ to see what packages are installed.
