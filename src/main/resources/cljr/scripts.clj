@@ -13,7 +13,7 @@
 	  "USER_HOME=\"" (get-user-home) "\"\n"
 	  "CLJR_HOME=\"" (get-cljr-home) "\"\n" 
 	  "CLASSPATH=src" (cygwin-safe-path-sep) "test" (cygwin-safe-path-sep) "." (cygwin-safe-path-sep) (get-cljr-home) "\n\n"
-    "if test $#==0; then\n"
+    "if [ \"$#\" = \"0\" ]; then\n"
     "  set \"repl\"\n"
     "fi\n\n"
     
