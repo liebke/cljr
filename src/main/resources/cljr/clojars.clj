@@ -1,22 +1,19 @@
 (ns cljr.clojars
-  (:require [clojure.string :as s])
+  (:require [clojure.string :as s]
+            clojure.xml)
   (:use [cljr core http]
 	[leiningen.deps :only (deps)]))
 
-
-(def *clojars-repo-url* "http://clojars.org/repo")
-(def *clojars-all-jars-url* (str *clojars-repo-url* "/all-jars.clj"))
-(def *clojars-all-poms-url* (str *clojars-repo-url* "/all-poms.txt"))
-
-
+(def clojars-repo-url "http://clojars.org/repo")
+(def clojars-all-jars-url (str clojars-repo-url "/all-jars.clj"))
+(def clojars-all-poms-url (str clojars-repo-url "/all-poms.txt"))
 
 (defn get-latest-version [library-name]
-  (let [response (http-get-text-seq *clojars-all-jars-url*)
+  (let [response (http-get-text-seq clojars-all-jars-url)
 	lib-name (symbol library-name)]
     (second (last (filter #(= (first %) lib-name)
 			  (for [line response]
 			    (read-string line)))))))
-
 
 (defn clojars-install
   ([library-name]
@@ -38,9 +35,8 @@
       (spit (str (get-cljr-home) (sep) project-clj) proj-str)
       (deps (get-project)))))
 
-
 (defn clojars-search [term]
-  (let [response (http-get-text-seq *clojars-all-jars-url*)]
+  (let [response (http-get-text-seq clojars-all-jars-url)]
     (println "\n\nLibraries on Clojars.org that contain the term: " term)
     (println "--------------------------------------------------------------------------------")
     (doseq [entry (for [line response :when (.contains line term)]
@@ -48,9 +44,8 @@
       (println "  " (first entry) "  " (second entry)))
     (println "\n\n")))
 
-
 (defn clojars-versions [library-name]
-  (let [response (http-get-text-seq *clojars-all-jars-url*)]
+  (let [response (http-get-text-seq clojars-all-jars-url)]
     (println "\n\nAvailable versions for library: " library-name)
     (println "--------------------------------------------------------------------------------")
     (doseq [entry (filter #(= (first %) (symbol library-name))
@@ -59,7 +54,6 @@
       (println "  " (first entry) "  " (second entry)))
     (println "\n\n")))
 
-
 (defn get-pom-dir
   ([library-name version]
      (let [id-str (if (.contains library-name "/")
@@ -67,34 +61,28 @@
 		    (str "./" library-name "/" library-name "/" version "/"))]
        id-str)))
 
-
 (defn get-pom-locations
   ([library-name version]
-     (let [response (http-get-text-seq *clojars-all-poms-url*)
+     (let [response (http-get-text-seq clojars-all-poms-url)
 	   pom-dir (get-pom-dir library-name version)]
        (for [line response :when (.startsWith line pom-dir)]
 	 line))))
-
 
 (defn get-latest-pom-location
   ([library-name version]
      (last (get-pom-locations library-name version))))
 
-
 (defn to-clojars-url
   ([file-location]
-     (str *clojars-repo-url* "/" file-location)))
-
+     (str clojars-repo-url "/" file-location)))
 
 (defn get-latest-pom-file
   ([library-name version]
      (http-get-text-seq (to-clojars-url (get-latest-pom-location library-name version)))))
 
-
 (defn extract-description-text [xml]
   (when-let [desc (re-find (re-pattern (str "<description>(.*)</description>")) xml)]
     (second desc)))
-
 
 (defn description-text [xml-seq]
   (-> (apply str
@@ -102,7 +90,6 @@
 		   :when (.contains line "<description>")]
 	       line))
       (extract-description-text)))
-
 
 (defn get-library-dependencies
   [library-name version]
@@ -118,7 +105,6 @@
     (into #{} (for [v deps-seq] (apply merge v)))
     (map :content (:content (first deps-xml)))))
 
-
 (defn print-library-dependencies
   [library-name version]
   (println (str "\n\nDependencies for: " library-name "  " version))
@@ -127,7 +113,6 @@
     (let [dep (apply merge (map #(hash-map (:tag %) (first (:content %))) d))]
       (println (str (:groupId dep) "/" (:artifactId dep) "  " (:version dep)))))
   (println "\n\n"))
-
 
 (defn clojars-describe
   ([library-name]
@@ -141,5 +126,3 @@
        (println "")
        (when desc-text
 	 (print-library-dependencies library-name version)))))
-
-

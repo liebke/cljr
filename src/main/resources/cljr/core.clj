@@ -1,10 +1,11 @@
 (ns cljr.core
   (:use [clojure.java.io :only (file copy)]
 	[leiningen.core :only (read-project)])
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            clojure.pprint))
 
 
-(def CLJR-VERSION "1.0.0-SNAPSHOT")
+(def CLJR-VERSION "1.3.0")
 
 (defn sep [] (java.io.File/separator))
 
@@ -17,13 +18,12 @@
 (def classpath-uninitialized? (ref true))
 
 
-(def base-dependencies [['org.clojure/clojure "1.2.0-beta1"]
-			['org.clojure/clojure-contrib "1.2.0-beta1"]
+(def base-dependencies [['org.clojure/clojure "1.3.0"]
 			['cljr  CLJR-VERSION]
-			['leiningen "1.1.0"]
-			['swingrepl "1.0.0-SNAPSHOT"]
-			['jline "0.9.94"]
-			['swank-clojure "1.2.1"]])
+			['leiningen "1.3.1" :exclusions ['jline]]
+			['swingrepl "1.3.0"]
+			['reply "0.1.0-beta6"]
+			['swank-clojure "1.5.0-SNAPSHOT"]])
 
 
 (defn get-user-home []
@@ -87,12 +87,23 @@
 	      (str (path-sep) (get-jars-classpath))])))
 
 
-(defn base-project-clj-string []
-  (pr-str `(leiningen.core/defproject cljr-repo "1.0.0-SNAPSHOT"
-	     :description "cljr is a Clojure REPL and package management system."
-	     :dependencies ~base-dependencies
-	     :classpath ~(get-classpath-vector))))
+(defn build-project-clj-string
+  [deps classpath repos]
+  {:pre [(every? vector? [deps classpath])]
+   :post [(string? %)]}
+  (with-out-str
+    (clojure.pprint/pprint
+     (concat
+      `(leiningen.core/defproject cljr-repo "1.3.0"
+         :description "cljr is a Clojure REP=L and package management system."
+         :dependencies ~deps
+         :classpath ~classpath)
+      (when-not (empty? repos)          ;Leiningen will poop out if
+                                        ;repos is empty
+        `(:repositories ~repos))))))
 
+(defn base-project-clj-string []
+  (build-project-clj-string base-dependencies (get-classpath-vector) []))
 
 (defn project-clj-string
   ([] (get-project) {})
@@ -100,17 +111,11 @@
      (let [deps (or (:dependencies entry-map) (:dependencies project-clj))
 	   classpath (or (:classpath entry-map) (:classpath project-clj))
 	   repos (or (:repositories entry-map) (:repositories project-clj))]
-       (pr-str `(leiningen.core/defproject cljr-repo "1.0.0-SNAPSHOT"
-		  :description "cljr is a Clojure REPL and package management system."
-		  :dependencies ~deps
-		  :classpath ~classpath
-		  :repositories ~repos)))))
-
+       (build-project-clj-string deps classpath repos))))
 
 (defn abort [msg]
   (println msg)
   (System/exit 1))
-
 
 (defn task-not-found [& _]
   (abort "That's not a task. Use \"cljr help\" to list all tasks."))
@@ -155,7 +160,3 @@
 	jar-files (when (include-cljr-repo-jars?)
 		    (seq (.listFiles cljr-repo)))]
     (filter identity (flatten (conj clojure-home-jars jar-files additional-paths)))))
-
-
-
-
