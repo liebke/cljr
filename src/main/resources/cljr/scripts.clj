@@ -13,16 +13,19 @@
 	  "USER_HOME=\"" (get-user-home) "\"\n"
 	  "CLJR_HOME=\"" (get-cljr-home) "\"\n" 
 	  "CLASSPATH=src" (cygwin-safe-path-sep) "test" (cygwin-safe-path-sep) "." (cygwin-safe-path-sep) (get-cljr-home) "\n\n"
+    "if test $#==0; then\n"
+    "  set \"repl\"\n"
+    "fi\n\n"
+    
+	  "if [ ! -n \"$JVM_OPTS\" ]; then\n"
+	  "   JVM_OPTS=\"-Xmx1G\"\n"
+	  "fi\n\n"
 
-	  "   if [ ! -n \"$JVM_OPTS\" ]; then\n"
-	  "      JVM_OPTS=\"-Xmx1G\"\n"
-	  "   fi\n\n"
-
-	  "   if [ \"$DISABLE_JLINE\" = \"true\" ]; then\n"
-	  "      JLINE=\"\"\n"
-	  "   else\n"
-	  "      JLINE=\"jline.ConsoleRunner\"\n"
-	  "   fi\n\n"
+	  "if [ \"$DISABLE_JLINE\" = \"true\" ]; then\n"
+	  "   JLINE=\"\"\n"
+	  "else\n"
+	  "   JLINE=\"jline.ConsoleRunner\"\n"
+	  "fi\n\n"
 
 	  "if [ \"$1\" = \"repl\" -o \"$1\" = \"swingrepl\" -o \"$1\" = \"swank\" -o \"$1\" = \"run\" ]; then\n"
 	  "   if [ -n \"$CLOJURE_HOME\" ]; then\n"
