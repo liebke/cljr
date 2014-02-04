@@ -23,7 +23,7 @@
        \newline
        "*  swingrepl: Starts a Clojure swingrepl." \newline
        \newline
-       "*  swank [port]: Start a local swank server on port 4005 (or as specified)." \newline
+       "*  swank [port [host]]: Start a local swank server on localhost port 4005 (or as specified)." \newline
        \newline
        "*  run filename: Runs the given Clojure file." \newline
        \newline

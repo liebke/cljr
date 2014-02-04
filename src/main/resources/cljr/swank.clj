@@ -3,11 +3,21 @@
 
 (defn swank
   ([]
-     (swank 4005))
+     (swank nil nil))
   ([port]
-     (cond
-      (nil? port) (start-repl 4005)
-      (integer? port) (start-repl port)
-      (string? port) (start-repl (Integer/parseInt port 10))
-      :else (println "Invalid port number: " port))))
+     (swank port nil))
+  ([port host]
+     (let [the-host (cond
+                     (nil? host) "localhost"
+                     (string? host) host
+                     :else (do (println "Invalid hostname:" host)
+                               nil))
+           the-port (cond
+                     (nil? port) 4005
+                     (integer? port) port
+                     (string? port) (try (Integer/parseInt port 10)
+                                         (catch NumberFormatException ex
+                                           nil)))]
+       (when (and the-host the-port)
+         (start-repl the-port :host the-host)))))
 
